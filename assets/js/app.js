@@ -238,13 +238,18 @@
       refresh();
     });
 
-    // чипы-фильтры
-    document.querySelectorAll('.chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
+    // чипы-фильтры: активный выбирается внутри своего ряда
+    document.querySelectorAll('.chips').forEach((row) => {
+      row.addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        row.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
         chip.classList.add('is-active');
-        state.filter = chip.dataset.filter;
-        refresh();
+        // фильтруем только проекты — данных по компонентам DMC пока нет
+        if (row.id === 'chips-projects') {
+          state.filter = chip.dataset.filter;
+          refresh();
+        }
       });
     });
 
@@ -263,13 +268,16 @@
           b.classList.toggle('is-active', on);
           b.setAttribute('aria-selected', String(on));
         });
-        // фильтры, подборки и сетка проектов относятся только к «Проектам»
-        $('.chips').classList.toggle('is-hidden', !isProjects);
+        // у каждого раздела свои ряды чипов
+        $('#chips-projects').classList.toggle('is-hidden', !isProjects);
+        $('#chips-dmc-access').classList.toggle('is-hidden', isProjects);
+        $('#chips-dmc-kind').classList.toggle('is-hidden', isProjects);
         document.querySelectorAll('.content > .section:not(#realm-dmc)').forEach((s) => {
           s.classList.toggle('is-hidden', !isProjects);
         });
         $('#realm-dmc').classList.toggle('is-hidden', isProjects);
         $('#panel').classList.toggle('is-hidden', !isProjects);
+        $('.btn-primary').textContent = isProjects ? 'Загрузить проект' : 'Загрузить компонент';
       });
     });
 

@@ -111,13 +111,27 @@
         </div>
       </div>
 
-      <!-- Чипы-фильтры (3287:8826) -->
-      <div class="chips" role="group" aria-label="Фильтры">
+      <!-- Чипы-фильтры проектов (3287:8826) -->
+      <div class="chips" id="chips-projects" role="group" aria-label="Фильтры проектов">
         <button class="chip is-active" type="button" data-filter="all">Все</button>
         <button class="chip" type="button" data-filter="official">Официальные</button>
         <button class="chip" type="button" data-filter="favorite">Избранные</button>
         <button class="chip" type="button" data-filter="mine">Мои проекты</button>
         <button class="chip" type="button" data-filter="shared">Доступные мне</button>
+      </div>
+
+      <!-- Цифровое оборудование: доступ + категории компонентов -->
+      <div class="chips is-hidden" id="chips-dmc-access" role="group" aria-label="Фильтры компонентов">
+        <button class="chip is-active" type="button" data-filter="all">Все</button>
+        <button class="chip" type="button" data-filter="mine">Мои компоненты</button>
+        <button class="chip" type="button" data-filter="favorite">Избранные</button>
+      </div>
+      <div class="chips is-hidden" id="chips-dmc-kind" role="group" aria-label="Категории компонентов">
+        <button class="chip is-active" type="button" data-kind="all">Все категории</button>
+        <button class="chip" type="button" data-kind="schemes">Схемы</button>
+        <button class="chip" type="button" data-kind="interpreters">Интерпретаторы</button>
+        <button class="chip" type="button" data-kind="posts">Постпроцессоры</button>
+        <button class="chip" type="button" data-kind="kits" title="Kit — схема, интерпретатор и постпроцессор в одном комплекте">Комплекты</button>
       </div>
 
       <!-- Подборки (3064:15497) -->
