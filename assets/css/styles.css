@@ -79,8 +79,31 @@ ul { margin: 0; padding: 0; list-style: none; }
   flex: 0 0 auto;
 }
 .iconbtn:hover { background: var(--ink-08); }
-.iconbtn > img { width: 32px; height: 32px; }
 .titlebar__tools { display: flex; align-items: center; gap: var(--gap-8); }
+
+/* Размеры глифов = leaf-размеры из Figma, а не размер бокса кнопки.
+   Иконки на 32-канвасе рисуются во всю кнопку, «обрезанные» — своим размером. */
+img[src$="logo-mark.svg"]         { width: 20px;     height: 22px; }
+img[src$="icn-new-project.svg"]   { width: 32px;     height: 32px; }
+img[src$="icn-open-project.svg"]  { width: 20px;     height: 16px; }
+img[src$="icn-save-project.svg"]  { width: 16px;     height: 19px; }
+img[src$="icn-settings.svg"]      { width: 32px;     height: 32px; }
+img[src$="icn-win-minimize.svg"]  { width: 32px;     height: 32px; }
+img[src$="icn-win-chevron.svg"]   { width: 32px;     height: 32px; }
+img[src$="icn-win-restore.svg"]   { width: 32px;     height: 32px; }
+img[src$="icn-win-close.svg"]     { width: 32px;     height: 32px; }
+img[src$="icn-view-list.svg"]     { width: 32px;     height: 32px; }
+img[src$="icn-plus.svg"]          { width: 12px;     height: 12px; }
+img[src$="icn-tab-close-active.svg"] { width: 8.707px; height: 8.707px; }
+img[src$="icn-kebab.svg"]         { width: 24px;     height: 24px; }
+img[src$="icn-star.svg"]          { width: 24px;     height: 24px; }
+img[src$="icn-globe.svg"]         { width: 16px;     height: 16px; }
+img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
+img[src$="icn-filter.svg"]        { width: 12px;     height: 12px; }
+
+/* Шеврон дропдауна: бокс 20px, глиф 13.5×7.25 (Dropdown Icon 30:3763) */
+.chev { position: relative; width: 20px; height: 20px; flex: 0 0 auto; }
+.chev img { position: absolute; left: 3.25px; top: 7px; width: 13.5px; height: 7.25px; }
 
 /* Бургер собран из трёх линий (3064:14678) */
 .burger { position: relative; overflow: hidden; }
@@ -116,8 +139,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .tab__title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab__close { width: 8px; height: 8px; flex: 0 0 auto; }
 .tab.is-active { background: var(--ink-08); color: var(--ink); padding: 9px 11px; }
-.tab:not(.is-active) .tab__close { opacity: 0; }
-.tab:not(.is-active):hover .tab__close { opacity: 1; }
+/* У неактивных табов крестик в макете не показан — держим 8px как спейсер */
+.tab:not(.is-active) .tab__close { visibility: hidden; }
+.tab:not(.is-active):hover .tab__close { visibility: visible; }
 .tab-new { display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--r-4); flex: 0 0 auto; }
 .tab-new:hover { background: var(--ink-08); }
 .tab-new img { width: 12px; height: 12px; }
@@ -229,7 +253,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .search input::placeholder { color: var(--n-900); }
 .search__icon { width: 24px; height: 24px; padding: 4px; flex: 0 0 auto; }
-.search__icon img { width: 15px; height: 16.694px; }
 
 .select {
   display: flex;
@@ -244,7 +267,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   white-space: nowrap;
   flex: 0 0 auto;
 }
-.select img { width: 20px; height: 20px; }
 
 .chip-filter {
   display: flex;
@@ -491,7 +513,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .panel__name { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; color: var(--n-800); }
 .panel__visibility { display: flex; align-items: center; gap: var(--gap-8); color: var(--n-900); }
-.panel__visibility img { width: 24px; height: 24px; padding: 4px; }
+.panel__visibility img { margin: 4px; } /* глиф 16px в боксе 24px */
 
 .panel__actions { display: flex; align-items: center; gap: var(--gap-8); }
 .btn {
@@ -560,7 +582,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .role--select { background: var(--n-900-04); border-color: var(--n-900-08); }
 .role--pill { border-radius: var(--r-pill); }
-.role img { width: 20px; height: 20px; flex: 0 0 auto; }
 .role--static { cursor: default; }
 
 .panel__foot { display: flex; align-items: center; justify-content: space-between; }

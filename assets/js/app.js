@@ -182,10 +182,12 @@
       label.textContent = u.role;
       role.appendChild(label);
       if (u.control !== 'static') {
+        const chevBox = el('span', 'chev');
         const chev = el('img');
-        chev.src = 'assets/img/icn-dropdown.svg';
+        chev.src = 'assets/img/icn-chevron.svg';
         chev.alt = '';
-        role.appendChild(chev);
+        chevBox.appendChild(chev);
+        role.appendChild(chevBox);
       }
 
       row.append(id, role);
