@@ -196,7 +196,7 @@
   }
 
   /* ── Состояние и взаимодействия ────────────────────────── */
-  const state = { filter: 'all', query: '', view: 'grid', selectedId: 'p03' };
+  const state = { filter: 'all', query: '', selectedId: 'p03' };
 
   function visibleProjects() {
     const q = state.query.trim().toLowerCase();
@@ -238,17 +238,6 @@
     $('#search').addEventListener('input', (e) => {
       state.query = e.target.value;
       refresh();
-    });
-
-    // переключатель вида
-    document.querySelectorAll('.viewswitch__btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        state.view = btn.dataset.view;
-        document.querySelectorAll('.viewswitch__btn').forEach((b) => {
-          b.setAttribute('aria-pressed', String(b === btn));
-        });
-        $('#projects').classList.toggle('is-list', state.view === 'list');
-      });
     });
 
     // табы проектов в титульной строке

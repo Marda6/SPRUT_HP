@@ -92,14 +92,12 @@ img[src$="icn-win-minimize.svg"]  { width: 32px;     height: 32px; }
 img[src$="icn-win-chevron.svg"]   { width: 32px;     height: 32px; }
 img[src$="icn-win-restore.svg"]   { width: 32px;     height: 32px; }
 img[src$="icn-win-close.svg"]     { width: 32px;     height: 32px; }
-img[src$="icn-view-list.svg"]     { width: 32px;     height: 32px; }
 img[src$="icn-plus.svg"]          { width: 12px;     height: 12px; }
 img[src$="icn-tab-close-active.svg"] { width: 8.707px; height: 8.707px; }
 img[src$="icn-kebab.svg"]         { width: 24px;     height: 24px; }
 img[src$="icn-star.svg"]          { width: 24px;     height: 24px; }
 img[src$="icn-globe.svg"]         { width: 16px;     height: 16px; }
 img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
-img[src$="icn-filter.svg"]        { width: 12px;     height: 12px; }
 
 /* Шеврон дропдауна: бокс 20px, глиф 13.5×7.25 (Dropdown Icon 30:3763) */
 .chev { position: relative; width: 20px; height: 20px; flex: 0 0 auto; }
@@ -138,7 +136,9 @@ img[src$="icn-filter.svg"]        { width: 12px;     height: 12px; }
 }
 .tab__title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tab__close { width: 8px; height: 8px; flex: 0 0 auto; }
-.tab.is-active { background: var(--ink-08); color: var(--ink); padding: 9px 11px; }
+/* В макете у активной вкладки padding 11px (резерв под скрытую иконку статуса);
+   выровнено на 16px, чтобы левый отступ был одинаковым у всех вкладок. */
+.tab.is-active { background: var(--ink-08); color: var(--ink); }
 /* У неактивных табов крестик в макете не показан — держим 8px как спейсер */
 .tab:not(.is-active) .tab__close { visibility: hidden; }
 .tab:not(.is-active):hover .tab__close { visibility: visible; }
@@ -271,7 +271,6 @@ img[src$="icn-filter.svg"]        { width: 12px;     height: 12px; }
 .chip-filter {
   display: flex;
   align-items: center;
-  gap: var(--gap-6);
   height: 40px;
   padding: 6px 16px;
   border: 1px solid var(--ink-08);
@@ -281,26 +280,6 @@ img[src$="icn-filter.svg"]        { width: 12px;     height: 12px; }
   white-space: nowrap;
   flex: 0 0 auto;
 }
-.chip-filter img { width: 12px; height: 12px; }
-
-.viewswitch { display: flex; align-items: center; gap: var(--gap-4); flex: 0 0 auto; }
-.viewswitch__btn { width: 32px; height: 32px; border-radius: var(--r-6); display: grid; place-items: center; }
-.viewswitch__btn:hover { background: var(--ink-08); }
-.viewswitch__btn img { width: 32px; height: 32px; }
-/* Иконка «плитка» — 4 квадрата 8px (3287:8848) */
-.icn-grid { position: relative; width: 32px; height: 32px; }
-.icn-grid i {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  background: var(--ink-08);
-}
-.icn-grid i:nth-child(1) { left: 7px; top: 7px; }
-.icn-grid i:nth-child(2) { left: 17px; top: 7px; }
-.icn-grid i:nth-child(3) { left: 7px; top: 17px; }
-.icn-grid i:nth-child(4) { left: 17px; top: 17px; }
 
 /* Чипы-фильтры (3287:8826) */
 .chips { display: flex; align-items: center; gap: var(--gap-8); height: 32px; padding: 0 12px; flex: 0 0 auto; }
@@ -599,10 +578,5 @@ img[src$="icn-filter.svg"]        { width: 12px;     height: 12px; }
   white-space: nowrap;
 }
 .btn-text:hover { background: var(--ink-08); color: var(--n-900); }
-
-/* ── Режим списка (переключатель вида) ───────────────────── */
-.grid.is-list { grid-template-columns: minmax(0, 1fr); }
-.grid.is-list .project { height: 88px; }
-.grid.is-list .project__preview { width: 120px; }
 
 .is-hidden { display: none !important; }
