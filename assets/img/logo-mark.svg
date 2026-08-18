@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="22" viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 920">
+<path id="Vector 1565" d="M19.5 6C19.5 5.81845 19.4018 5.6507 19.2432 5.5625L10.2432 0.5625C10.0922 0.478605 9.90785 0.478605 9.75684 0.5625L0.756836 5.5625C0.598152 5.6507 0.5 5.81845 0.5 6L0.5 16C0.5 16.1816 0.598152 16.3493 0.756836 16.4375L9.75684 21.4375L9.81543 21.4648C9.95374 21.5198 10.1111 21.5109 10.2432 21.4375L19.2432 16.4375C19.4018 16.3493 19.5 16.1816 19.5 16V6Z" stroke="url(#paint0_linear_0_36)" stroke-linejoin="round"/>
+<path id="Vector 1566" d="M1 16L4 14.3333M10 1V4.33333M19 16L16 14.3333" stroke="#091E33" stroke-linejoin="round"/>
+<path id="Ellipse 753" d="M14.8571 11C14.8571 13.7614 12.6185 16 9.85712 16C7.09569 16 4.85712 13.7614 4.85712 11C4.85712 8.23858 7.09569 6 9.85712 6C12.6185 6 14.8571 8.23858 14.8571 11Z" fill="#FF5F5F"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_36" x1="10" y1="1" x2="10" y2="21" gradientUnits="userSpaceOnUse">
+<stop stop-color="#091E33"/>
+<stop offset="1" stop-color="#091E33"/>
+</linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>СПРУТКАМ — Библиотека</title>
+<link rel="icon" href="assets/img/logo-mark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500&family=Roboto:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Титульная строка (Figma 3064:14669) ───────────────── -->
+  <header class="titlebar">
+    <div class="titlebar__left">
+      <div class="logo">
+        <img class="logo__mark" src="assets/img/logo-mark.svg" alt="">
+        <span class="logo__text">СПРУТКАМ</span>
+      </div>
+      <div class="titlebar__tools">
+        <button class="iconbtn burger" type="button" aria-label="Меню">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="iconbtn" type="button" aria-label="Новый проект">
+          <img src="assets/img/icn-new-project.svg" alt="">
+        </button>
+        <button class="iconbtn" type="button" aria-label="Открыть проект">
+          <img src="assets/img/icn-open-project.svg" alt="">
+        </button>
+        <button class="iconbtn" type="button" aria-label="Сохранить проект">
+          <img src="assets/img/icn-save-project.svg" alt="">
+        </button>
+      </div>
+    </div>
+
+    <nav class="tabs" aria-label="Открытые проекты">
+      <span class="tabs__sep"></span>
+      <button class="tab is-active" type="button">
+        <span class="tab__title">Turn part probing 2</span>
+        <img class="tab__close" src="assets/img/icn-tab-close-active.svg" alt="Закрыть">
+      </button>
+      <span class="tabs__sep"></span>
+      <button class="tab" type="button">
+        <span class="tab__title">Новый проект 2</span>
+        <img class="tab__close" src="assets/img/icn-tab-close.svg" alt="Закрыть">
+      </button>
+      <span class="tabs__sep"></span>
+      <button class="tab" type="button">
+        <span class="tab__title">Новый проект 3</span>
+        <img class="tab__close" src="assets/img/icn-tab-close.svg" alt="Закрыть">
+      </button>
+      <button class="tab-new" type="button" aria-label="Новая вкладка">
+        <img src="assets/img/icn-plus.svg" alt="">
+      </button>
+    </nav>
+
+    <div class="window-controls">
+      <button class="iconbtn" type="button" aria-label="Свернуть"><img src="assets/img/icn-win-minimize.svg" alt=""></button>
+      <button class="iconbtn" type="button" aria-label="Настройки"><img src="assets/img/icn-settings.svg" alt=""></button>
+      <button class="iconbtn" type="button" aria-label="Ещё"><img src="assets/img/icn-win-chevron.svg" alt=""></button>
+      <button class="iconbtn" type="button" aria-label="Развернуть"><img src="assets/img/icn-win-restore.svg" alt=""></button>
+      <button class="iconbtn" type="button" aria-label="Закрыть"><img src="assets/img/icn-win-close.svg" alt=""></button>
+    </div>
+  </header>
+
+  <div class="app__body">
+
+    <!-- ── Контент (machine 3064:14741) ────────────────────── -->
+    <main class="content">
+
+      <!-- Навигация разделов (3064:14742) -->
+      <nav class="section-nav" aria-label="Разделы">
+        <div class="section-nav__group">
+          <button class="navtab" type="button" data-section="recent">Недавние</button>
+          <button class="navtab is-active" type="button" data-section="library" aria-current="page">Библиотека</button>
+          <button class="navtab" type="button" data-section="local">Локальные</button>
+          <span class="section-nav__sep"></span>
+          <button class="navtab" type="button" data-section="archive">Архив</button>
+        </div>
+        <button class="navtab" type="button" data-section="licenses">Менеджер лицензий</button>
+      </nav>
+
+      <!-- Заголовок и тулбар (3064:14760) -->
+      <div class="toolbar">
+        <h1 class="page-title">Библиотека</h1>
+        <div class="toolbar__actions">
+          <button class="btn-primary" type="button">Загрузить проект</button>
+          <label class="search">
+            <input type="search" id="search" placeholder="Поиск" aria-label="Поиск проектов">
+            <span class="search__icon"><img src="assets/img/icn-search.svg" alt=""></span>
+          </label>
+          <button class="select" type="button">
+            <span>Недавние</span>
+            <img src="assets/img/icn-dropdown.svg" alt="">
+          </button>
+          <button class="chip-filter" type="button">
+            <img src="assets/img/icn-filter.svg" alt="">
+            <span>Фильры</span>
+          </button>
+          <div class="viewswitch" role="group" aria-label="Вид">
+            <button class="viewswitch__btn" type="button" data-view="list" aria-label="Список">
+              <img src="assets/img/icn-view-list.svg" alt="">
+            </button>
+            <button class="viewswitch__btn" type="button" data-view="grid" aria-label="Плитка" aria-pressed="true">
+              <span class="icn-grid"><i></i><i></i><i></i><i></i></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Чипы-фильтры (3287:8826) -->
+      <div class="chips" role="group" aria-label="Фильтры">
+        <button class="chip is-active" type="button" data-filter="all">Все</button>
+        <button class="chip" type="button" data-filter="official">Официальные</button>
+        <button class="chip" type="button" data-filter="favorite">Избранные</button>
+        <button class="chip" type="button" data-filter="mine">Мои проекты</button>
+        <button class="chip" type="button" data-filter="shared">Доступные мне</button>
+      </div>
+
+      <!-- Подборки (3064:15497) -->
+      <section class="section">
+        <div class="section__head">
+          <h2 class="section__title">Подборки</h2>
+          <a class="section__link" href="#">Посмотреть все</a>
+        </div>
+        <div class="grid grid--collections" id="collections"></div>
+      </section>
+
+      <!-- Проекты (3064:14798) -->
+      <section class="section">
+        <div class="section__head">
+          <h2 class="section__title">Проекты</h2>
+        </div>
+        <div class="grid" id="projects"></div>
+      </section>
+
+    </main>
+
+    <!-- ── Панель свойств (machine 3064:14827) ─────────────── -->
+    <aside class="panel" id="panel" aria-label="Свойства проекта">
+      <div class="panel__preview">
+        <span class="pv" id="panel-preview"></span>
+      </div>
+
+      <div class="panel__head">
+        <h2 class="panel__name" id="panel-name">From Drawing</h2>
+        <span class="panel__visibility">
+          <img src="assets/img/icn-globe.svg" alt="">
+          <span id="panel-visibility">Публичный</span>
+        </span>
+      </div>
+
+      <div class="panel__actions">
+        <button class="btn" type="button">Поделиться</button>
+        <button class="btn" type="button">3D просмотр</button>
+        <button class="btn btn--dark" type="button">Открыть</button>
+      </div>
+
+      <div class="pblock">
+        <div class="pblock__title">Информация</div>
+        <div id="panel-props"></div>
+      </div>
+
+      <div class="panel__divider"></div>
+
+      <div class="pblock pblock--wrap">
+        <div class="pblock__title">Оси</div>
+        <div class="tag-list" id="panel-axes"></div>
+      </div>
+
+      <div class="panel__divider"></div>
+
+      <div class="pblock pblock--wrap">
+        <div class="pblock__title">Тэги</div>
+        <div class="tag-list" id="panel-tags"></div>
+      </div>
+
+      <div class="panel__divider"></div>
+
+      <div class="pblock">
+        <div class="pblock__title">Пользователи</div>
+        <div class="userlist" id="panel-users"></div>
+      </div>
+
+      <div class="panel__divider"></div>
+
+      <div class="panel__foot">
+        <div class="panel__foot-group">
+          <button class="btn-text" type="button">Удалить</button>
+          <button class="btn-text" type="button">Архив</button>
+        </div>
+        <button class="btn-text" type="button">Изменить</button>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
