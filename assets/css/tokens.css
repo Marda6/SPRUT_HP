@@ -30,13 +30,9 @@
 
   /* Акцент — выделение карточки, чипы оси/тэга */
   --accent: #3671d8;
-  --accent-40: rgba(54, 113, 216, 0.4);
-  --accent-08: rgba(54, 113, 216, 0.08);
-  --accent-04: rgba(54, 113, 216, 0.04);
   --card-shadow: 0 0 1px 0 rgba(9, 30, 51, 0.5);
-  /* Ховер карточки — намёк на выделение; selected — явное двойное кольцо */
-  --card-shadow-hover: 0 0 1px 0 rgba(9, 30, 51, 0.5), 0 2px 8px 0 rgba(9, 30, 51, 0.1);
-  --card-shadow-selected: 0 0 0 1px var(--accent), 0 4px 12px 0 rgba(54, 113, 216, 0.2);
+  /* Selected: кольцо 1px добирает толщину бордера + лёгкая тень */
+  --card-shadow-selected: 0 0 0 1px var(--accent), 0 2px 8px 0 rgba(9, 30, 51, 0.1);
 
   /* Типографика */
   --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;

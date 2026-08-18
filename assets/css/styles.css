@@ -389,22 +389,16 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   border: 1px solid transparent;
   transition: border-color 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
 }
-/* Ховер — «предпросмотр» выделения: тот же язык, но приглушённый */
-.project:hover {
-  border-color: var(--accent-40);
-  background: var(--accent-04);
-  box-shadow: var(--card-shadow-hover);
-}
-.project:hover .project__preview { background: var(--ink-08); }
-/* Selected — явное состояние: двойное кольцо акцентом + тень и тинт */
+/* Ховер — тонкий синий бордер и синий заголовок, больше ничего */
+.project:hover { border-color: var(--accent); }
+.project:hover .project__name { color: var(--accent); }
+/* Selected — бордер пожирнее (кольцо 1px, чтобы не смещать вёрстку) + лёгкая тень */
 .project.is-selected {
   border-color: var(--accent);
-  background: var(--accent-08);
   box-shadow: var(--card-shadow-selected);
 }
 .project.is-selected .project__name { color: var(--accent); }
 .project.is-selected .project__preview { background: var(--ink-08); }
-.project.is-selected .card-divider { background: var(--accent-40); }
 .project__preview {
   position: relative;
   width: 160px;
