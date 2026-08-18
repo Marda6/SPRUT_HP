@@ -392,6 +392,10 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   padding: 2px;
 }
 
+/* Компоненты DMC — пять в ряд: карточки высокие, в четырёх колонках они
+   растягивались слишком широко */
+.grid--dmc { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
 /* Подборки: карточка фиксированной ширины 287.5px, ряд выровнен влево (3064:15501) */
 .grid--collections {
   grid-template-columns: repeat(4, 287.5px);
@@ -535,7 +539,9 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   top: 50%;
   transform: translate(-50%, -50%);
 }
-.dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); padding: 0 8px 0 12px; }
+/* тело тянется, поэтому разделитель и футер прижаты к низу и стоят на одной
+   линии во всех карточках ряда, независимо от длины названия и оснащения */
+.dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); flex: 1 1 auto; padding: 0 8px 0 12px; }
 .dmc__head { display: flex; align-items: baseline; gap: var(--gap-8); }
 /* Цена напротив названия. «Включён в тех. поддержку» — не число, поэтому мельче */
 .dmc__price {
@@ -576,8 +582,11 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .dmc .prop__value { padding: 2px 0; }
 /* одна строка: лишние плашки сворачиваются в «+N» (см. fitEquipment) */
 .dmc__equipment { display: flex; align-items: center; gap: var(--gap-4); overflow: hidden; white-space: nowrap; }
-.dmc__equipment .tag { flex: 0 0 auto; }
-.tag--more { color: var(--ink-60); }
+/* видимая плашка при нехватке места усекается троеточием, а не режется по краю */
+.dmc__equipment .tag { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* на время замера в fitEquipment сжатие выключаем, иначе строка всегда «влезает» */
+.dmc__equipment.is-measuring .tag { flex: 0 0 auto; }
+.dmc__equipment .tag--more { flex: 0 0 auto; color: var(--ink-60); }
 .tag--neutral { border-color: var(--ink-16); background: var(--ink-04); color: var(--ink-80); }
 
 /* Категория компонента и его состояние */

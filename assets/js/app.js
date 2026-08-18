@@ -163,19 +163,22 @@
       if (!tags.length) return;
       row.querySelector('.tag--more')?.remove();
       tags.forEach((t) => t.classList.remove('is-hidden'));
-      if (row.scrollWidth <= row.clientWidth) return;
 
-      const more = el('span', 'tag tag--neutral tag--more');
-      row.appendChild(more);
-      let hidden = 0;
-      // прячем с конца, но одна плашка остаётся видимой всегда
-      for (let i = tags.length - 1; i >= 1; i--) {
-        tags[i].classList.add('is-hidden');
-        hidden += 1;
-        more.textContent = `+${hidden}`;
-        more.title = tags.slice(tags.length - hidden).map((t) => t.textContent).join(', ');
-        if (row.scrollWidth <= row.clientWidth) break;
+      row.classList.add('is-measuring');
+      if (row.scrollWidth > row.clientWidth) {
+        const more = el('span', 'tag tag--neutral tag--more');
+        row.appendChild(more);
+        let hidden = 0;
+        // прячем с конца, но одна плашка остаётся видимой всегда
+        for (let i = tags.length - 1; i >= 1; i--) {
+          tags[i].classList.add('is-hidden');
+          hidden += 1;
+          more.textContent = `+${hidden}`;
+          more.title = tags.slice(tags.length - hidden).map((t) => t.textContent).join(', ');
+          if (row.scrollWidth <= row.clientWidth) break;
+        }
       }
+      row.classList.remove('is-measuring');
     });
   }
 
