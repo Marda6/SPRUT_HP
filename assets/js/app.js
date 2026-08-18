@@ -495,7 +495,8 @@
     renderProjects(visibleProjects());
     const selected = PROJECTS.find((p) => p.id === state.selectedId);
     if (selected) renderPanel(selected);
-    $('#panel').classList.toggle('is-hidden', !selected);
+    // панель принадлежит своему разделу и в чужом всегда скрыта
+    $('#panel').classList.toggle('is-hidden', !selected || state.realm !== 'projects');
   }
 
   function visibleDmc() {
@@ -597,10 +598,11 @@
           s.classList.toggle('is-hidden', !isProjects);
         });
         $('#realm-dmc').classList.toggle('is-hidden', isProjects);
-        $('#panel').classList.toggle('is-hidden', !isProjects);
         // загрузка компонентов идёт не отсюда — в DMC кнопки нет
         $('.btn-primary').classList.toggle('is-hidden', !isProjects);
-        if (!isProjects) refreshDmc();
+        // обе панели перерисовываем: каждая сама скроется в чужом разделе
+        refresh();
+        refreshDmc();
       });
     });
 

@@ -40,6 +40,9 @@
   --kind-interpreter: #6b4bd6; --kind-interpreter-bg: rgba(149, 132, 235, 0.14);
   --kind-post: #2f62c4;        --kind-post-bg: rgba(54, 113, 216, 0.1);
   --kind-kit: #8a6a12;         --kind-kit-bg: rgba(235, 193, 74, 0.2);
+  /* В макете граница карточки — только тень 0 0 1px: на тусклых мониторах она
+     сливается с белым фоном, поэтому добавлена видимая рамка. */
+  --card-border: rgba(9, 30, 51, 0.16);
   --card-shadow: 0 0 1px 0 rgba(9, 30, 51, 0.5);
   /* Selected: кольцо 1px добирает толщину бордера + лёгкая тень */
   --card-shadow-selected: 0 0 0 1px var(--accent), 0 2px 8px 0 rgba(9, 30, 51, 0.1);
