@@ -53,6 +53,10 @@
   --gap-12: 12px;
   --gap-16: 16px;
 
+  /* Скроллбары */
+  --scroll-thumb: rgba(9, 30, 51, 0.2);
+  --scroll-thumb-hover: rgba(9, 30, 51, 0.35);
+
   /* Размеры каркаса */
   --titlebar-h: 44px;
   --panel-w: 360px;
