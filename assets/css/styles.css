@@ -695,8 +695,11 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 /* ── Панель компонента DMC ──────────────────────────────── */
 /* шире панели проекта: в блоках «Станок» и «Стойка ЧПУ» поля идут в две
    колонки, как в референсе, и «X 500 × Y 350 × Z 356 мм» не ломается */
-.panel.panel--dmc { width: var(--panel-dmc-w); }
-.pdmc__head { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 0 auto; padding: 4px 4px 0; }
+/* места по вертикали хватает, поэтому шаг между блоками крупнее, чем
+   в панели проекта: 16px снаружи, 12px внутри групп */
+.panel.panel--dmc { width: var(--panel-dmc-w); gap: var(--gap-16); padding: 16px; }
+.pdmc__head { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 0 auto; }
+.panel--dmc .panel__scroll { gap: var(--gap-16); }
 .pdmc__title { display: flex; align-items: flex-start; gap: var(--gap-8); }
 .pdmc__name {
   margin: 0;
@@ -712,7 +715,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .pdmc__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-8); color: var(--ink-60); }
 .pdmc__meta-sep { width: 1px; height: 12px; background: var(--ink-16); flex: 0 0 auto; }
 /* кнопки и цена закреплены над вкладками */
-.pdmc__cta { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 0 auto; }
+.pdmc__cta { display: flex; flex-direction: column; gap: var(--gap-12); flex: 0 0 auto; }
 
 /* вкладки панели */
 .ptabs {
@@ -729,7 +732,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   align-items: center;
   justify-content: center;
   flex: 1 1 0;
-  height: 28px;
+  height: 32px;
   border-radius: var(--r-6);
   color: var(--ink-80);
   white-space: nowrap;
@@ -757,14 +760,10 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .pdmc__price { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink); }
 .pdmc__price--free { color: var(--ok); }
 
-.pdmc__block { display: flex; flex-direction: column; gap: var(--gap-8); }
-.pdmc__block-title {
-  font-weight: 600;
-  color: var(--ink-60);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  font-size: 11px;
-}
+.pdmc__block { display: flex; flex-direction: column; gap: var(--gap-12); }
+/* группы разделяем линией, заголовок — весом и насыщенностью, без капслока */
+.pdmc__block + .pdmc__block { padding-top: var(--gap-16); border-top: 1px solid var(--ink-08); }
+.pdmc__block-title { font-weight: 600; color: var(--ink); }
 /* поля в две колонки: подпись сверху, значение под ней */
 .pdmc__props { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-12) var(--gap-8); }
 .pdmc__prop { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
