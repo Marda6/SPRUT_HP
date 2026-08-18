@@ -131,6 +131,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   color: var(--ink-80);
   font-size: 12px;
   line-height: 14px;
+  text-align: left; /* у <button> по умолчанию center */
   flex: 0 0 auto;
   overflow: hidden;
 }
