@@ -58,7 +58,7 @@
   /* ── Цифровое оборудование ─────────────────────────────── */
   /* Цена: 0 — бесплатно, 'support' — по подписке на техподдержку, число — рубли */
   function priceLabel(price) {
-    if (price === 'support') return 'По подписке';
+    if (price === 'support') return 'Тех. поддержка';
     if (!price) return 'Бесплатно';
     return `${String(price).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`;
   }
@@ -107,10 +107,13 @@
       const name = el('h3', 'dmc__name');
       name.textContent = d.name;
       name.title = d.name;
-      // напротив названия — категория; цена ушла в футер
-      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
-      kind.textContent = kindDef.chip || '';
-      head.append(name, kind);
+      // напротив названия — избранное; категория и цена в футере
+      const fav = iconButton(d.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg',
+        d.favorite ? 'Убрать из избранного' : 'В избранное');
+      fav.classList.add('card-icon--fav');
+      if (d.favorite) fav.classList.add('is-on');
+      fav.dataset.fav = d.id;
+      head.append(name, fav);
 
       // набор полей зависит от категории; высота зарезервирована под максимум,
       // чтобы карточки разных категорий не скакали по высоте
@@ -142,16 +145,14 @@
 
       body.append(head, props);
 
-      // футер: цена слева, избранное справа
+      // футер: категория слева, цена справа
       const foot = el('div', 'card-foot');
+      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
+      kind.textContent = kindDef.chip || '';
       const price = el('span', 'dmc__price');
       price.textContent = priceLabel(d.price);
       if (d.price === 'support') price.title = 'Включён в техническую поддержку';
-      const fav = iconButton(d.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg', d.favorite ? 'Убрать из избранного' : 'В избранное');
-      fav.classList.add('card-icon--fav');
-      if (d.favorite) fav.classList.add('is-on');
-      fav.dataset.fav = d.id;
-      foot.append(price, el('span', 'card-foot__spacer'), fav);
+      foot.append(kind, el('span', 'card-foot__spacer'), price);
 
       card.append(preview, body, el('div', 'card-divider'), foot);
       host.appendChild(card);
