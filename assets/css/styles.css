@@ -756,9 +756,18 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .pdmc__actions .btn { padding: 8px 12px; white-space: nowrap; }
 .pdmc__link { color: var(--accent); }
 .pdmc__link:hover { text-decoration: underline; }
-.pdmc__price-row { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-8); padding: 0 4px; }
-.pdmc__price { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink); }
-.pdmc__price--free { color: var(--ok); }
+/* цена в своей рамке: подпись слева, значение справа, без цветового выделения */
+.pdmc__price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-8);
+  padding: 8px 12px;
+  border: 1px solid var(--ink-08);
+  border-radius: var(--r-8);
+  background: var(--ink-04);
+}
+.pdmc__price { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--ink); }
 
 .pdmc__block { display: flex; flex-direction: column; gap: var(--gap-12); }
 /* группы разделяем линией, заголовок — весом и насыщенностью, без капслока */

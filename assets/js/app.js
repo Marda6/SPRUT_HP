@@ -240,12 +240,14 @@
     ask.href = '#';
     ask.textContent = 'Спросить о компоненте';
 
-    // ссылка и цена — одной строкой под кнопками
+    // цена в отдельной рамке, чтобы не терялась
     const priceRow = el('div', 'pdmc__price-row');
-    const priceVal = el('span', `pdmc__price${d.price ? '' : ' pdmc__price--free'}`);
+    const priceKey = el('span', 'pdmc__key');
+    priceKey.textContent = 'Цена';
+    const priceVal = el('span', 'pdmc__price');
     priceVal.textContent = priceLabel(d.price);
-    priceRow.append(ask, priceVal);
-    cta.append(actions, priceRow);
+    priceRow.append(priceKey, priceVal);
+    cta.append(actions, ask, priceRow);
 
     const body = $('#pdmc-body');
     body.textContent = '';
