@@ -55,7 +55,11 @@
     return btn;
   }
 
-  /* ── Категории «Цифрового оборудования» ────────────────── */
+  /* ── Цифровое оборудование ─────────────────────────────── */
+  function kindCount(id) {
+    return id === 'all' ? DMC_ITEMS.length : DMC_ITEMS.filter((d) => d.kind === id).length;
+  }
+
   function renderKindChips() {
     const host = $('#chips-dmc-kind');
     host.textContent = '';
@@ -67,9 +71,73 @@
       const label = el('span');
       label.textContent = k.label;
       const count = el('span', 'chip__count');
-      count.textContent = k.count;
+      count.textContent = kindCount(k.id);
       chip.append(label, count);
       host.appendChild(chip);
+    });
+  }
+
+  /* Карточка компонента: состав полей как в референсе, стиль карточки проекта */
+  function renderDmcItems(list) {
+    const host = $('#dmc-items');
+    host.textContent = '';
+    list.forEach((d) => {
+      const card = el('button', 'dmc');
+      card.type = 'button';
+      card.dataset.id = d.id;
+      if (d.selected) card.classList.add('is-selected');
+
+      const preview = el('div', 'dmc__preview');
+      const pv = el('span', 'pv');
+      previewInto(pv, 72);
+      preview.appendChild(pv);
+
+      const body = el('div', 'dmc__body');
+      const head = el('div', 'dmc__head');
+      const name = el('h3', 'dmc__name');
+      name.textContent = d.name;
+      name.title = d.name;
+      head.append(name, statusIcon(d.status));
+
+      const props = el('div', 'dmc__props');
+      [['Стойка ЧПУ', d.control], ['Тип', d.type], ['Оси', d.axes], ['Рабочая зона, мм', d.area]]
+        .forEach(([k, v]) => {
+          const row = el('div', 'prop');
+          const key = el('div', 'prop__key');
+          key.textContent = k;
+          const val = el('div', 'prop__value');
+          val.textContent = v;
+          row.append(key, val);
+          props.appendChild(row);
+        });
+      // «Оснащение» — та же строка, но значение набором тэгов
+      const eq = el('div', 'prop');
+      const eqKey = el('div', 'prop__key');
+      eqKey.textContent = 'Оснащение';
+      const eqVal = el('div', 'prop__value dmc__equipment');
+      d.equipment.forEach((t) => {
+        const tag = el('span', 'tag tag--neutral');
+        tag.textContent = t;
+        eqVal.appendChild(tag);
+      });
+      eq.append(eqKey, eqVal);
+      props.appendChild(eq);
+
+      body.append(head, props);
+
+      const foot = el('div', 'card-foot');
+      const kind = el('span', 'kind-tag');
+      kind.textContent = (DMC_KINDS.find((k) => k.id === d.kind) || {}).chip || '';
+      const st = DMC_STATE[d.state];
+      const state = el('span', `dmc__state dmc__state--${st.tone}`);
+      state.textContent = st.label;
+      const actions = el('div', 'card-foot__actions');
+      if (d.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранное'));
+      actions.appendChild(iconButton('assets/img/icn-kebab.svg', 'Действия'));
+      foot.append(kind, state, actions);
+
+      card.append(preview, body, el('div', 'card-divider'), foot);
+      host.appendChild(card);
     });
   }
 
@@ -217,7 +285,15 @@
   }
 
   /* ── Состояние и взаимодействия ────────────────────────── */
-  const state = { filter: 'all', query: '', selectedId: 'p03' };
+  const state = {
+    realm: 'projects',
+    filter: 'all',
+    query: '',
+    selectedId: 'p03',
+    dmcFilter: 'all',
+    dmcKind: 'all',
+    dmcSelectedId: 'd01',
+  };
 
   function visibleProjects() {
     const q = state.query.trim().toLowerCase();
@@ -233,6 +309,20 @@
     const selected = PROJECTS.find((p) => p.id === state.selectedId);
     if (selected) renderPanel(selected);
     $('#panel').classList.toggle('is-hidden', !selected);
+  }
+
+  function visibleDmc() {
+    const q = state.query.trim().toLowerCase();
+    return DMC_ITEMS.filter((d) => {
+      const byAccess = state.dmcFilter === 'all' || d.groups.includes(state.dmcFilter);
+      const byKind = state.dmcKind === 'all' || d.kind === state.dmcKind;
+      const byQuery = !q || d.name.toLowerCase().includes(q) || d.control.toLowerCase().includes(q);
+      return byAccess && byKind && byQuery;
+    }).map((d) => ({ ...d, selected: d.id === state.dmcSelectedId }));
+  }
+
+  function refreshDmc() {
+    renderDmcItems(visibleDmc());
   }
 
   function bind() {
@@ -254,24 +344,37 @@
         const set = chip.closest('.chips__set') || row;
         set.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
         chip.classList.add('is-active');
-        // фильтруем только проекты — данных по компонентам DMC пока нет
         if (row.id === 'chips-projects') {
           state.filter = chip.dataset.filter;
           refresh();
+        } else {
+          if (chip.dataset.filter) state.dmcFilter = chip.dataset.filter;
+          if (chip.dataset.kind) state.dmcKind = chip.dataset.kind;
+          refreshDmc();
         }
       });
     });
 
-    // поиск
+    // выбор компонента
+    $('#dmc-items').addEventListener('click', (e) => {
+      const card = e.target.closest('.dmc');
+      if (!card || e.target.closest('.card-icon')) return;
+      state.dmcSelectedId = card.dataset.id;
+      refreshDmc();
+    });
+
+    // поиск — работает в активном разделе
     $('#search').addEventListener('input', (e) => {
       state.query = e.target.value;
-      refresh();
+      if (state.realm === 'projects') refresh();
+      else refreshDmc();
     });
 
     // разделы библиотеки: Проекты / Цифровое оборудование
     document.querySelectorAll('.seg__btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const isProjects = btn.dataset.realm === 'projects';
+        state.realm = isProjects ? 'projects' : 'dmc';
         document.querySelectorAll('.seg__btn').forEach((b) => {
           const on = b === btn;
           b.classList.toggle('is-active', on);
@@ -285,7 +388,9 @@
         });
         $('#realm-dmc').classList.toggle('is-hidden', isProjects);
         $('#panel').classList.toggle('is-hidden', !isProjects);
-        $('.btn-primary').textContent = isProjects ? 'Загрузить проект' : 'Загрузить компонент';
+        // загрузка компонентов идёт не отсюда — в DMC кнопки нет
+        $('.btn-primary').classList.toggle('is-hidden', !isProjects);
+        if (!isProjects) refreshDmc();
       });
     });
 
