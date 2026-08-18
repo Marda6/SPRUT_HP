@@ -393,9 +393,14 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   padding: 2px;
 }
 
-/* Компоненты DMC — пять в ряд: карточки высокие, в четырёх колонках они
-   растягивались слишком широко */
-.grid--dmc { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+/* Компоненты DMC. Ширина карточки фиксирована по содержимому:
+   12 + подпись 108 + 12 + самая широкая плашка оснащения 165 + 4 + «+N» 32 + 8.
+   Карточки не растягиваются, лишнее место уходит в промежутки между ними. */
+/* Число колонок считается по минимуму (иначе браузер берёт максимум и теряет
+   одну колонку), а ширину карточки ограничиваем сверху, чтобы на широких
+   окнах она не разъезжалась. */
+.grid--dmc { grid-template-columns: repeat(auto-fill, minmax(var(--dmc-card-min), 1fr)); }
+.dmc { max-width: var(--dmc-card-w); }
 
 /* Подборки: карточка фиксированной ширины 287.5px, ряд выровнен влево (3064:15501) */
 .grid--collections {
@@ -573,8 +578,14 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .dmc .prop__value { text-align: left; }
 .dmc .prop__key,
 .dmc .prop__value { padding: 2px 0; }
-/* подпись по центру относительно значения — важно для строки с плашками */
-.dmc .prop { align-items: center; }
+/* колонка подписей по самой широкой из них («Рабочая зона, мм»), остальное —
+   значению; подпись по центру относительно значения */
+.dmc .prop {
+  display: grid;
+  grid-template-columns: var(--dmc-key-w) minmax(0, 1fr);
+  gap: var(--gap-8);
+  align-items: center;
+}
 /* строка оснащения без вертикальных отступов: плашка 20px = высота обычной
    строки, иначе карточки с оснащением выше остальных на 4px */
 .dmc .dmc__equipment { padding-top: 0; padding-bottom: 0; }
@@ -582,7 +593,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .dmc__equipment { display: flex; align-items: center; gap: var(--gap-4); overflow: hidden; white-space: nowrap; }
 /* плашки в 20px, чтобы строка оснащения не ломала ритм остальных строк;
    видимая плашка при нехватке места усекается троеточием, а не режется по краю */
-.dmc__equipment .tag { height: 20px; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.dmc__equipment .tag { height: 20px; padding: 0 6px; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* на время замера в fitEquipment сжатие выключаем, иначе строка всегда «влезает» */
 .dmc__equipment.is-measuring .tag { flex: 0 0 auto; }
 .dmc__equipment .tag--more { flex: 0 0 auto; color: var(--ink-60); }

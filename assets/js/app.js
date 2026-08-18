@@ -120,6 +120,7 @@
         const row = el('div', 'prop');
         const key = el('div', 'prop__key');
         key.textContent = DMC_FIELD_LABEL[field];
+        if (field === 'area') key.title = 'Рабочая зона, мм';
         const val = el('div', field === 'equipment' ? 'prop__value dmc__equipment' : 'prop__value');
         if (field === 'equipment') {
           if (!d.equipment.length) {
