@@ -103,7 +103,7 @@
 
       const preview = el('div', 'project__preview');
       const pv = el('span', 'pv');
-      previewInto(pv, 48);
+      previewInto(pv, 80);  // как рендер детали в макете — ~половина бокса 160px
       preview.appendChild(pv);
 
       const col = el('div', 'project__col');
@@ -130,7 +130,7 @@
 
   /* ── Правая панель ─────────────────────────────────────── */
   function renderPanel(p) {
-    previewInto($('#panel-preview'), 96);
+    previewInto($('#panel-preview'), 144);
     $('#panel-name').textContent = p.name;
     $('#panel-name').title = p.name;
     // тип проекта: та же иконка, что в карточке, + короткая подпись

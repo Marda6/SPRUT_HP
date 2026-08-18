@@ -15,10 +15,12 @@ const LIBRARY_LOCATION = 'Библиотека';
    Глобус и глифы «Access project» (layers a/b) — экспорт из Figma;
    icn-user.svg — заглушка «один человек», в Figma такой фигуры пока нет. */
 const STATUS = {
-  public:       { short: 'Публичный',    label: 'Публичный проект',                     icon: 'assets/img/icn-globe.svg' },
-  sharedByMe:   { short: 'Я поделился',  label: 'Мой проект, я поделился им',           layers: 'a' },
-  sharedWithMe: { short: 'Доступен мне', label: 'Проект, доступный мне',                layers: 'b' },
-  private:      { short: 'Приватный',    label: 'Мой проект, доступен только мне',      icon: 'assets/img/icn-user.svg' },
+  // short — подпись в правой панели; «мой» и «мой, я поделился» подписаны
+  // одинаково: разницу уже показывает иконка, она же расшифрована в label
+  public:       { short: 'Публичный',    label: 'Публичный проект',                icon: 'assets/img/icn-globe.svg' },
+  sharedByMe:   { short: 'Мой проект',   label: 'Мой проект, я поделился им',      layers: 'a' },
+  sharedWithMe: { short: 'Доступен мне', label: 'Проект, доступный мне',           layers: 'b' },
+  private:      { short: 'Мой проект',   label: 'Мой проект, доступен только мне', icon: 'assets/img/icn-user.svg' },
 };
 
 /* Какой чип-фильтр отвечает за какой тип */

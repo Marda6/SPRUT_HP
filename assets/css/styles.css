@@ -487,11 +487,11 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .access__layer--2 { left: 13.33px; top: 8px; width: 5px; height: 5px; }
 .access__layer--3 { left: 3.33px; top: 13px; width: 12px; height: 6px; }
 .access__layer--4 { left: 11.33px; top: 14px; width: 10px; height: 5px; }
-/* Одиночные глифы по центру бокса. Глобус из Figma — контурный на канвасе 16px,
-   фигуры «человек» — заливка на 24px, поэтому глобус показываем на 20px,
-   чтобы вес читался одинаково. */
+/* Одиночные глифы по центру бокса. Фигура «человек» нарисована в боксе 24px,
+   но занимает 14px по высоте — глобус даём в его нативных 16px, чтобы
+   пятно было того же размера. */
 .access__single { left: 50%; top: 50%; transform: translate(-50%, -50%); }
-.access img.access__single[src$="icn-globe.svg"] { width: 20px; height: 20px; }
+.access img.access__single[src$="icn-globe.svg"] { width: 16px; height: 16px; }
 .access img.access__single[src$="icn-user.svg"] { width: 24px; height: 24px; }
 
 /* ── Правая панель (machine 3064:14827) ──────────────────── */
