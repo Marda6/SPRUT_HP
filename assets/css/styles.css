@@ -536,7 +536,25 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   transform: translate(-50%, -50%);
 }
 .dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); padding: 0 8px 0 12px; }
-.dmc__head { display: flex; align-items: flex-start; gap: var(--gap-8); }
+.dmc__head { display: flex; align-items: baseline; gap: var(--gap-8); }
+/* Цена напротив названия. «Включён в тех. поддержку» — не число, поэтому мельче */
+.dmc__price {
+  flex: 0 0 auto;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.dmc__price--note {
+  max-width: 130px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--ink-60);
+  text-align: right;
+  white-space: normal;
+}
 .dmc__name {
   margin: 0;
   flex: 1 1 auto;
@@ -556,7 +574,10 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .dmc .prop__value { text-align: left; }
 .dmc .prop__key,
 .dmc .prop__value { padding: 2px 0; }
-.dmc__equipment { display: flex; flex-wrap: wrap; gap: var(--gap-4); }
+/* одна строка: лишние плашки сворачиваются в «+N» (см. fitEquipment) */
+.dmc__equipment { display: flex; align-items: center; gap: var(--gap-4); overflow: hidden; white-space: nowrap; }
+.dmc__equipment .tag { flex: 0 0 auto; }
+.tag--more { color: var(--ink-60); }
 .tag--neutral { border-color: var(--ink-16); background: var(--ink-04); color: var(--ink-80); }
 
 /* Категория компонента и его состояние */
@@ -571,9 +592,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   white-space: nowrap;
   flex: 0 0 auto;
 }
-.dmc__state { flex: 1 1 auto; min-width: 0; text-align: right; }
-.dmc__state--ok { color: var(--ok); }
-.dmc__state--muted { color: var(--ink-60); }
+.card-foot__spacer { flex: 1 1 auto; }
 
 /* Общие строки карточек */
 .card-meta { display: flex; align-items: center; gap: var(--gap-8); }

@@ -34,32 +34,25 @@ const DMC_KINDS = [
   { id: 'kits', label: 'Комплекты', chip: 'Комплект', hint: 'Kit — схема, интерпретатор и постпроцессор в одном комплекте' },
 ];
 
-/* Состояние компонента: готов к работе / на доработке / устарел */
-const DMC_STATE = {
-  ready: { label: 'Готов', tone: 'ok' },
-  maintenance: { label: 'В обслуживании', tone: 'muted' },
-  deprecated: { label: 'Устарел', tone: 'muted' },
-};
-
 /* Компоненты цифрового оборудования. Состав полей — как в референсе карточки:
    стойка, тип, оси, рабочая зона, оснащение. */
 const DMC_ITEMS = [
-  { id: 'd01', name: 'Makino DA 90',        kind: 'schemes',       control: 'Okuma',        type: 'Mill Turn',   axes: '6+',  area: '830 × 480 × 730',  equipment: ['Барфидер', 'Приводной инструмент'], state: 'maintenance', status: 'public',       favorite: true },
-  { id: 'd02', name: 'Mori Seiki NT 4250',  kind: 'kits',          control: 'Fanuc 31i',    type: 'Mill Turn',   axes: '9',   area: '1250 × 660 × 700', equipment: ['Барфидер', 'Противошпиндель'],      state: 'ready',       status: 'public' },
-  { id: 'd03', name: 'DMG MORI DMU 50',     kind: 'schemes',       control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '650 × 520 × 475',  equipment: ['Поворотный стол'],                  state: 'ready',       status: 'public' },
-  { id: 'd04', name: 'Haas VF-2SS',         kind: 'schemes',       control: 'Haas NGC',     type: '3X Mill',     axes: '3',   area: '760 × 410 × 510',  equipment: ['СОЖ через шпиндель'],               state: 'ready',       status: 'sharedWithMe' },
-  { id: 'd05', name: 'Okuma LB3000 EX',     kind: 'schemes',       control: 'Okuma OSP',    type: 'Turning',     axes: '4',   area: 'Ø410 × 1000',      equipment: ['Барфидер', 'Люнет'],                state: 'ready',       status: 'public' },
-  { id: 'd06', name: 'Fanuc 31i Mill Turn', kind: 'interpreters',  control: 'Fanuc 31i',    type: 'Mill Turn',   axes: '6+',  area: '—',                equipment: ['Циклы сверления', 'TCPM'],          state: 'ready',       status: 'public',       favorite: true },
-  { id: 'd07', name: 'Siemens 840D sl',     kind: 'interpreters',  control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы фрезерования', 'TRAORI'],     state: 'ready',       status: 'public' },
-  { id: 'd08', name: 'Heidenhain TNC 640',  kind: 'interpreters',  control: 'TNC 640',      type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы измерения'],                  state: 'maintenance', status: 'private' },
-  { id: 'd09', name: 'Fanuc 0i-MF post',    kind: 'posts',         control: 'Fanuc 0i-MF',  type: '3X Mill',     axes: '3',   area: '—',                equipment: ['G54.1', 'Подпрограммы'],            state: 'ready',       status: 'sharedByMe' },
-  { id: 'd10', name: 'Sinumerik 828D post', kind: 'posts',         control: 'Sinumerik 828D', type: 'Turning',   axes: '4',   area: '—',                equipment: ['Циклы точения'],                    state: 'ready',       status: 'private' },
-  { id: 'd11', name: 'Mazak Smooth G post', kind: 'posts',         control: 'Smooth G',     type: 'Mill Turn',   axes: '9',   area: '—',                equipment: ['Синхронизация каналов'],            state: 'maintenance', status: 'sharedByMe',   favorite: true },
-  { id: 'd12', name: 'Grob G350 kit',       kind: 'kits',          control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '700 × 800 × 900',  equipment: ['Паллеты', 'Поворотный стол'],       state: 'ready',       status: 'public' },
-  { id: 'd13', name: 'Hermle C42 U',        kind: 'schemes',       control: 'TNC 640',      type: '5X Mill',     axes: '5',   area: '800 × 800 × 550',  equipment: ['Поворотный стол'],                  state: 'ready',       status: 'sharedWithMe' },
-  { id: 'd14', name: 'Doosan Puma 2600',    kind: 'schemes',       control: 'Fanuc 31i',    type: 'Turning',     axes: '3',   area: 'Ø460 × 700',       equipment: ['Люнет'],                            state: 'deprecated',  status: 'public' },
-  { id: 'd15', name: 'Sodick AQ537L',       kind: 'schemes',       control: 'Sodick LN2',   type: 'Wire EDM',    axes: '4',   area: '500 × 370 × 300',  equipment: ['Автозаправка проволоки'],           state: 'ready',       status: 'public' },
-  { id: 'd16', name: 'Haas ST-20 post',     kind: 'posts',         control: 'Haas NGC',     type: 'Turning',     axes: '2',   area: '—',                equipment: ['Циклы точения'],                    state: 'ready',       status: 'private' },
+  { id: 'd01', price: 0, name: 'Makino DA 90',        kind: 'schemes',       control: 'Okuma',        type: 'Mill Turn',   axes: '6+',  area: '830 × 480 × 730',  equipment: ['Барфидер', 'Приводной инструмент'], status: 'public',       favorite: true },
+  { id: 'd02', price: 148000, name: 'Mori Seiki NT 4250',  kind: 'kits',          control: 'Fanuc 31i',    type: 'Mill Turn',   axes: '9',   area: '1250 × 660 × 700', equipment: ['Барфидер', 'Противошпиндель', 'Люнет', 'Приводной инструмент'],       status: 'public' },
+  { id: 'd03', price: 0, name: 'DMG MORI DMU 50',     kind: 'schemes',       control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '650 × 520 × 475',  equipment: ['Поворотный стол', 'СОЖ через шпиндель', 'Измерительный щуп'],       status: 'public' },
+  { id: 'd04', price: 'support', name: 'Haas VF-2SS',         kind: 'schemes',       control: 'Haas NGC',     type: '3X Mill',     axes: '3',   area: '760 × 410 × 510',  equipment: ['СОЖ через шпиндель'],       status: 'sharedWithMe' },
+  { id: 'd05', price: 96000, name: 'Okuma LB3000 EX',     kind: 'schemes',       control: 'Okuma OSP',    type: 'Turning',     axes: '4',   area: 'Ø410 × 1000',      equipment: ['Барфидер', 'Люнет', 'Противошпиндель'],       status: 'public' },
+  { id: 'd06', price: 'support', name: 'Fanuc 31i Mill Turn', kind: 'interpreters',  control: 'Fanuc 31i',    type: 'Mill Turn',   axes: '6+',  area: '—',                equipment: ['Циклы сверления', 'TCPM'],       status: 'public',       favorite: true },
+  { id: 'd07', price: 'support', name: 'Siemens 840D sl',     kind: 'interpreters',  control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы фрезерования', 'TRAORI'],       status: 'public' },
+  { id: 'd08', price: 0, name: 'Heidenhain TNC 640',  kind: 'interpreters',  control: 'TNC 640',      type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы измерения'], status: 'private' },
+  { id: 'd09', price: 24500, name: 'Fanuc 0i-MF post',    kind: 'posts',         control: 'Fanuc 0i-MF',  type: '3X Mill',     axes: '3',   area: '—',                equipment: ['G54.1', 'Подпрограммы'],       status: 'sharedByMe' },
+  { id: 'd10', price: 0, name: 'Sinumerik 828D post', kind: 'posts',         control: 'Sinumerik 828D', type: 'Turning',   axes: '4',   area: '—',                equipment: ['Циклы точения'],       status: 'private' },
+  { id: 'd11', price: 39000, name: 'Mazak Smooth G post', kind: 'posts',         control: 'Smooth G',     type: 'Mill Turn',   axes: '9',   area: '—',                equipment: ['Синхронизация каналов'], status: 'sharedByMe',   favorite: true },
+  { id: 'd12', price: 210000, name: 'Grob G350 kit',       kind: 'kits',          control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '700 × 800 × 900',  equipment: ['Паллеты', 'Поворотный стол', 'Измерительный щуп', 'Смена инструмента'],       status: 'public' },
+  { id: 'd13', price: 0, name: 'Hermle C42 U',        kind: 'schemes',       control: 'TNC 640',      type: '5X Mill',     axes: '5',   area: '800 × 800 × 550',  equipment: ['Поворотный стол', 'Приводной инструмент', 'СОЖ через шпиндель'],       status: 'sharedWithMe' },
+  { id: 'd14', price: 0, name: 'Doosan Puma 2600',    kind: 'schemes',       control: 'Fanuc 31i',    type: 'Turning',     axes: '3',   area: 'Ø460 × 700',       equipment: [],  status: 'public' },
+  { id: 'd15', price: 132000, name: 'Sodick AQ537L',       kind: 'schemes',       control: 'Sodick LN2',   type: 'Wire EDM',    axes: '4',   area: '500 × 370 × 300',  equipment: ['Автозаправка проволоки'],       status: 'public' },
+  { id: 'd16', price: 'support', name: 'Haas ST-20 post',     kind: 'posts',         control: 'Haas NGC',     type: 'Turning',     axes: '2',   area: '—',                equipment: ['Циклы точения'],       status: 'private' },
 ].map((d) => {
   // чипы доступа: «Мои компоненты» = приватные и те, которыми я поделился
   const groups = [];

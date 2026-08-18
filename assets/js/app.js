@@ -56,6 +56,13 @@
   }
 
   /* ── Цифровое оборудование ─────────────────────────────── */
+  /* Цена: 0 — бесплатно, 'support' — по подписке на техподдержку, число — рубли */
+  function priceLabel(price) {
+    if (price === 'support') return 'Включён в тех. поддержку';
+    if (!price) return 'Бесплатно';
+    return `${String(price).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`;
+  }
+
   function kindCount(id) {
     return id === 'all' ? DMC_ITEMS.length : DMC_ITEMS.filter((d) => d.kind === id).length;
   }
@@ -97,7 +104,10 @@
       const name = el('h3', 'dmc__name');
       name.textContent = d.name;
       name.title = d.name;
-      head.append(name, statusIcon(d.status));
+      // цена — напротив названия; иконку типа в карточке компонента не показываем
+      const price = el('span', d.price === 'support' ? 'dmc__price dmc__price--note' : 'dmc__price');
+      price.textContent = priceLabel(d.price);
+      head.append(name, price);
 
       const props = el('div', 'dmc__props');
       [['Стойка ЧПУ', d.control], ['Тип', d.type], ['Оси', d.axes], ['Рабочая зона, мм', d.area]]
@@ -115,29 +125,57 @@
       const eqKey = el('div', 'prop__key');
       eqKey.textContent = 'Оснащение';
       const eqVal = el('div', 'prop__value dmc__equipment');
-      d.equipment.forEach((t) => {
-        const tag = el('span', 'tag tag--neutral');
-        tag.textContent = t;
-        eqVal.appendChild(tag);
-      });
+      if (!d.equipment.length) {
+        eqVal.textContent = '—';
+      } else {
+        d.equipment.forEach((t) => {
+          const tag = el('span', 'tag tag--neutral');
+          tag.textContent = t;
+          tag.title = t;
+          eqVal.appendChild(tag);
+        });
+      }
       eq.append(eqKey, eqVal);
       props.appendChild(eq);
 
       body.append(head, props);
 
+      // футер: категория слева, избранное и действия справа
       const foot = el('div', 'card-foot');
       const kind = el('span', 'kind-tag');
       kind.textContent = (DMC_KINDS.find((k) => k.id === d.kind) || {}).chip || '';
-      const st = DMC_STATE[d.state];
-      const state = el('span', `dmc__state dmc__state--${st.tone}`);
-      state.textContent = st.label;
+      const spacer = el('span', 'card-foot__spacer');
       const actions = el('div', 'card-foot__actions');
-      if (d.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранное'));
+      if (d.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранном'));
       actions.appendChild(iconButton('assets/img/icn-kebab.svg', 'Действия'));
-      foot.append(kind, state, actions);
+      foot.append(kind, spacer, actions);
 
       card.append(preview, body, el('div', 'card-divider'), foot);
       host.appendChild(card);
+    });
+    fitEquipment();
+  }
+
+  /* Оснащение держим в одну строку: что не влезло — сворачиваем в тег «+N» */
+  function fitEquipment() {
+    document.querySelectorAll('.dmc__equipment').forEach((row) => {
+      const tags = [...row.querySelectorAll('.tag')].filter((t) => !t.classList.contains('tag--more'));
+      if (!tags.length) return;
+      row.querySelector('.tag--more')?.remove();
+      tags.forEach((t) => t.classList.remove('is-hidden'));
+      if (row.scrollWidth <= row.clientWidth) return;
+
+      const more = el('span', 'tag tag--neutral tag--more');
+      row.appendChild(more);
+      let hidden = 0;
+      // прячем с конца, но одна плашка остаётся видимой всегда
+      for (let i = tags.length - 1; i >= 1; i--) {
+        tags[i].classList.add('is-hidden');
+        hidden += 1;
+        more.textContent = `+${hidden}`;
+        more.title = tags.slice(tags.length - hidden).map((t) => t.textContent).join(', ');
+        if (row.scrollWidth <= row.clientWidth) break;
+      }
     });
   }
 
@@ -392,6 +430,11 @@
         $('.btn-primary').classList.toggle('is-hidden', !isProjects);
         if (!isProjects) refreshDmc();
       });
+    });
+
+    // при изменении ширины пересчитываем, сколько плашек оснащения влезает
+    window.addEventListener('resize', () => {
+      if (state.realm === 'dmc') fitEquipment();
     });
 
     // табы проектов в титульной строке
