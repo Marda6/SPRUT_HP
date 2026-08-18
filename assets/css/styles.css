@@ -167,6 +167,9 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   flex: 1 1 auto;
   min-width: 0;
   overflow-y: auto;
+  /* место под полосу зарезервировано всегда — иначе при фильтрации,
+     когда скролл исчезает, вся раскладка прыгает по горизонтали */
+  scrollbar-gutter: stable;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -494,6 +497,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   display: flex;
   flex-direction: column;
   gap: var(--gap-8);
