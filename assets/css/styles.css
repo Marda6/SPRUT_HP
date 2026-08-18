@@ -477,8 +477,10 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .card-icon { width: 24px; height: 24px; border-radius: var(--r-4); flex: 0 0 auto; }
 .card-icon img { width: 24px; height: 24px; }
 
-/* Иконка доступа — 4 слоя из Figma (Access project 2093:4310…4313) */
+/* Иконка статуса проекта. Глиф «Access project» (2093:4310…4313) — 4 слоя
+   с позициями из Figma; одиночные глифы (глобус, облако) — 16px по центру. */
 .access { position: relative; width: 24px; height: 24px; flex: 0 0 auto; overflow: hidden; }
+.access .access__single { position: absolute; left: 4px; top: 4px; width: 16px; height: 16px; }
 .access img { position: absolute; }
 .access img:nth-child(1) { left: 5.33px; top: 5px; width: 7px; height: 7px; }
 .access img:nth-child(2) { left: 13.33px; top: 8px; width: 5px; height: 5px; }
@@ -541,8 +543,15 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   overflow: hidden;
   overflow-wrap: anywhere;
 }
-.panel__visibility { display: flex; align-items: center; gap: var(--gap-8); color: var(--n-900); }
-.panel__visibility img { margin: 4px; } /* глиф 16px в боксе 24px */
+.panel__visibility {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-8);
+  color: var(--n-900);
+  flex: 0 0 auto;
+  max-width: 60%;
+  text-align: right;
+}
 
 .panel__actions { display: flex; align-items: center; gap: var(--gap-8); }
 .btn {
