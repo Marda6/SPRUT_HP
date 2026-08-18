@@ -109,6 +109,7 @@ img[src$="icn-plus.svg"]          { width: 12px;     height: 12px; }
 img[src$="icn-tab-close-active.svg"] { width: 8.707px; height: 8.707px; }
 img[src$="icn-kebab.svg"]         { width: 24px;     height: 24px; }
 img[src$="icn-star.svg"]          { width: 24px;     height: 24px; }
+img[src$="icn-star-on.svg"]       { width: 24px;     height: 24px; }
 img[src$="icn-globe.svg"]         { width: 16px;     height: 16px; }
 img[src$="icn-user.svg"]          { width: 24px;     height: 24px; }
 img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
@@ -589,13 +590,14 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
    не менялась высота относительно остальных плашек) */
 .tag.tag--neutral { border-color: transparent; background: var(--ink-08); color: var(--ink-80); }
 
-/* Категория компонента — свой цвет у каждой */
+/* Категория компонента — свой цвет у каждой. Радиус 4px, как у остальных
+   тегов: pill в системе только у чипов-фильтров. */
 .kind-tag {
   display: flex;
   align-items: center;
-  height: 24px;
+  height: 20px;
   padding: 0 8px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-4);
   white-space: nowrap;
   flex: 0 0 auto;
 }

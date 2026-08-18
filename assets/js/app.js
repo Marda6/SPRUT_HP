@@ -146,7 +146,7 @@
       const price = el('span', 'dmc__price');
       price.textContent = priceLabel(d.price);
       if (d.price === 'support') price.title = 'Включён в техническую поддержку';
-      const fav = iconButton('assets/img/icn-star.svg', d.favorite ? 'Убрать из избранного' : 'В избранное');
+      const fav = iconButton(d.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg', d.favorite ? 'Убрать из избранного' : 'В избранное');
       fav.classList.add('card-icon--fav');
       if (d.favorite) fav.classList.add('is-on');
       fav.dataset.fav = d.id;
@@ -237,7 +237,7 @@
       location.textContent = p.location;
       const actions = el('div', 'card-foot__actions');
       // звезда всегда в разметке: у избранных видна, у остальных — по ховеру
-      const fav = iconButton('assets/img/icn-star.svg', p.favorite ? 'Убрать из избранного' : 'В избранное');
+      const fav = iconButton(p.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg', p.favorite ? 'Убрать из избранного' : 'В избранное');
       fav.classList.add('card-icon--fav');
       if (p.favorite) fav.classList.add('is-on');
       fav.dataset.fav = p.id;
