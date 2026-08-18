@@ -58,7 +58,7 @@
   /* ── Цифровое оборудование ─────────────────────────────── */
   /* Цена: 0 — бесплатно, 'support' — по подписке на техподдержку, число — рубли */
   function priceLabel(price) {
-    if (price === 'support') return 'Включён в тех. поддержку';
+    if (price === 'support') return 'По подписке';
     if (!price) return 'Бесплатно';
     return `${String(price).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} ₽`;
   }
@@ -101,26 +101,16 @@
       previewInto(pv, 72, kindDef.icon); // у каждой категории своя иконка превью
       preview.appendChild(pv);
 
-      // категория и избранное — по нижнему краю превью
-      const overlay = el('div', 'dmc__overlay');
-      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
-      kind.textContent = kindDef.chip || '';
-      const fav = iconButton('assets/img/icn-star.svg', d.favorite ? 'Убрать из избранного' : 'В избранное');
-      fav.classList.add('card-icon--fav');
-      if (d.favorite) fav.classList.add('is-on');
-      fav.dataset.fav = d.id;
-      overlay.append(kind, el('span', 'card-foot__spacer'), fav);
-      preview.appendChild(overlay);
 
       const body = el('div', 'dmc__body');
       const head = el('div', 'dmc__head');
       const name = el('h3', 'dmc__name');
       name.textContent = d.name;
       name.title = d.name;
-      // цена — напротив названия; иконку типа в карточке компонента не показываем
-      const price = el('span', d.price === 'support' ? 'dmc__price dmc__price--note' : 'dmc__price');
-      price.textContent = priceLabel(d.price);
-      head.append(name, price);
+      // напротив названия — категория; цена ушла в футер
+      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
+      kind.textContent = kindDef.chip || '';
+      head.append(name, kind);
 
       // набор полей зависит от категории; высота зарезервирована под максимум,
       // чтобы карточки разных категорий не скакали по высоте
@@ -151,7 +141,18 @@
 
       body.append(head, props);
 
-      card.append(preview, body);
+      // футер: цена слева, избранное справа
+      const foot = el('div', 'card-foot');
+      const price = el('span', 'dmc__price');
+      price.textContent = priceLabel(d.price);
+      if (d.price === 'support') price.title = 'Включён в техническую поддержку';
+      const fav = iconButton('assets/img/icn-star.svg', d.favorite ? 'Убрать из избранного' : 'В избранное');
+      fav.classList.add('card-icon--fav');
+      if (d.favorite) fav.classList.add('is-on');
+      fav.dataset.fav = d.id;
+      foot.append(price, el('span', 'card-foot__spacer'), fav);
+
+      card.append(preview, body, el('div', 'card-divider'), foot);
       host.appendChild(card);
     });
     fitEquipment();

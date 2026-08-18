@@ -539,22 +539,11 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   top: 50%;
   transform: translate(-50%, -50%);
 }
-/* категория и избранное лежат на превью по нижнему краю */
-.dmc__overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--gap-8);
-  padding: 8px 8px 8px 12px;
-}
 /* тело тянется, поэтому разделитель и футер прижаты к низу и стоят на одной
    линии во всех карточках ряда, независимо от длины названия и оснащения */
 .dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); flex: 1 1 auto; padding: 0 8px 0 12px; }
-.dmc__head { display: flex; align-items: baseline; gap: var(--gap-8); }
-/* Цена напротив названия. «Включён в тех. поддержку» — не число, поэтому мельче */
+.dmc__head { display: flex; align-items: flex-start; gap: var(--gap-8); }
+/* Цена в футере, слева от избранного */
 .dmc__price {
   flex: 0 0 auto;
   font-size: 14px;
@@ -562,15 +551,6 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   font-weight: 500;
   color: var(--ink);
   white-space: nowrap;
-}
-.dmc__price--note {
-  max-width: 130px;
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 400;
-  color: var(--ink-60);
-  text-align: right;
-  white-space: normal;
 }
 .dmc__name {
   margin: 0;
