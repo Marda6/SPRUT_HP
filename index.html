@@ -159,6 +159,28 @@
 
     </main>
 
+    <!-- ── Панель компонента DMC ───────────────────────────── -->
+    <aside class="panel panel--dmc is-hidden" id="panel-dmc" aria-label="Свойства компонента">
+      <div class="pdmc__head">
+        <div class="pdmc__title">
+          <h2 class="pdmc__name" id="pdmc-name"></h2>
+          <button class="card-icon card-icon--fav is-on" type="button" id="pdmc-fav" aria-label="В избранное">
+            <img src="assets/img/icn-star.svg" alt="">
+          </button>
+        </div>
+        <div class="pdmc__badges" id="pdmc-badges"></div>
+        <div class="pdmc__meta" id="pdmc-meta"></div>
+      </div>
+
+      <div class="ptabs" role="tablist" aria-label="Разделы компонента">
+        <button class="ptabs__btn is-active" type="button" role="tab" aria-selected="true" data-ptab="about">Обзор</button>
+        <button class="ptabs__btn" type="button" role="tab" aria-selected="false" data-ptab="specs">Параметры</button>
+        <button class="ptabs__btn" type="button" role="tab" aria-selected="false" data-ptab="links">Связи</button>
+      </div>
+
+      <div class="panel__scroll" id="pdmc-body"></div>
+    </aside>
+
     <!-- ── Панель свойств (machine 3064:14827) ─────────────── -->
     <aside class="panel" id="panel" aria-label="Свойства проекта">
       <div class="panel__preview">

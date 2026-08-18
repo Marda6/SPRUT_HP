@@ -82,6 +82,62 @@ const DMC_ITEMS = [
   return { ...d, groups };
 });
 
+/* Подробности компонента для боковой панели. Часть полей выводится из уже
+   имеющихся, чтобы не дублировать данные: производитель — первое слово
+   названия станка, модель — остаток, стойка разбирается так же.
+   Версию ENCY не показываем. */
+function dmcDetail(d) {
+  const machineName = d.machine || d.name;
+  const [mMaker, ...mRest] = machineName.split(' ');
+  const [cMaker, ...cRest] = d.control.split(' ');
+  const tested = ['Не тестировался', 'Тестировался', 'Тестировался частично'][d.id.charCodeAt(2) % 3];
+  return {
+    about: DMC_ABOUT[d.kind].replace('{{name}}', d.name).replace('{{control}}', d.control),
+    tested,
+    machine: [
+      ['Производитель', mMaker],
+      ['Тип станка', d.type],
+      ['Серия', mRest.length > 1 ? mRest[0] : '—'],
+      ['Модель', mRest.join(' ') || '—'],
+      ['Число осей', d.axes],
+      ['Рабочая зона', d.area && d.area !== '—' ? `${d.area} мм` : '—'],
+    ],
+    controller: [
+      ['Производитель', cMaker],
+      ['Серия', cRest[0] || '—'],
+      ['Модель', cRest.join(' ') || d.control],
+      ['Единицы', 'Метрические'],
+    ],
+    publisher: [
+      ['Автор', d.status === 'public' ? '—' : 'Иван Винокур'],
+      ['Компания', d.status === 'public' ? 'СПРУТ-ТЕХНОЛОГИЯ' : 'Личный аккаунт'],
+      ['Статус', 'Опубликован'],
+      ['Загрузок', String(d.id.charCodeAt(2) * 7 % 240)],
+      ['Опубликован', '03.08.2026'],
+      ['Обновлён', '13.08.2026'],
+    ],
+  };
+}
+
+const DMC_ABOUT = {
+  schemes: 'Схема станка — точный цифровой двойник {{name}} со стойкой {{control}}. Даёт корректную симуляцию, контроль столкновений и проверку управляющих программ прямо в CAM.',
+  interpreters: 'Интерпретатор {{name}} разбирает управляющие программы стойки {{control}}: циклы, коррекции и кинематику, чтобы симуляция совпадала с поведением станка.',
+  posts: 'Постпроцессор {{name}} формирует управляющую программу для стойки {{control}} с учётом циклов, коррекций и ограничений станка.',
+  kits: 'Комплект для {{name}}: схема станка, интерпретатор и постпроцессор, согласованные между собой и проверенные вместе.',
+};
+
+/* Связанные компоненты: подбираем из тех же данных по стойке ЧПУ */
+function dmcLinked(d) {
+  const byKind = (kind) => DMC_ITEMS.filter((x) => x.kind === kind && x.id !== d.id);
+  const sameControl = (list) => list.filter((x) => x.control === d.control);
+  const pick = (kind) => (sameControl(byKind(kind)).length ? sameControl(byKind(kind)) : byKind(kind).slice(0, 1));
+  return [
+    { title: 'Подходящие постпроцессоры', items: pick('posts').slice(0, 2) },
+    { title: 'Подходящие интерпретаторы', items: pick('interpreters').slice(0, 2) },
+    { title: 'Подобраны автоматически', items: byKind('kits').slice(0, 1) },
+  ].filter((g) => g.items.length);
+}
+
 /* Какой чип-фильтр отвечает за какой тип */
 const CHIP_BY_STATUS = {
   public: 'official',

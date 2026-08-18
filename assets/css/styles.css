@@ -692,6 +692,109 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   mask-image: url("../img/icn-status-shared-with-me.svg");
 }
 
+/* ── Панель компонента DMC ──────────────────────────────── */
+/* шире панели проекта: в блоках «Станок» и «Стойка ЧПУ» поля идут в две
+   колонки, как в референсе, и «X 500 × Y 350 × Z 356 мм» не ломается */
+.panel.panel--dmc { width: var(--panel-dmc-w); }
+.pdmc__head { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 0 auto; padding: 4px 4px 0; }
+.pdmc__title { display: flex; align-items: flex-start; gap: var(--gap-8); }
+.pdmc__name {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--ink);
+}
+.pdmc__badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-8); }
+.pdmc__meta { color: var(--ink-60); }
+
+/* вкладки панели */
+.ptabs {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  padding: 2px;
+  border-radius: var(--r-8);
+  background: var(--ink-08);
+  flex: 0 0 auto;
+}
+.ptabs__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  height: 28px;
+  border-radius: var(--r-6);
+  color: var(--ink-80);
+  white-space: nowrap;
+}
+.ptabs__btn:hover { color: var(--ink); }
+.ptabs__btn.is-active { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: var(--card-shadow); }
+
+.pdmc__actions { display: flex; flex-direction: column; gap: var(--gap-8); }
+.pdmc__actions .btn { padding: 8px 16px; }
+.pdmc__link { color: var(--accent); }
+.pdmc__link:hover { text-decoration: underline; }
+.pdmc__price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: var(--r-8);
+  background: var(--ink-04);
+}
+.pdmc__price { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink); }
+.pdmc__price--free { color: var(--ok); }
+
+.pdmc__block { display: flex; flex-direction: column; gap: var(--gap-8); }
+.pdmc__block-title {
+  font-weight: 600;
+  color: var(--ink-60);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-size: 11px;
+}
+/* поля в две колонки: подпись сверху, значение под ней */
+.pdmc__props { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-12) var(--gap-8); }
+.pdmc__prop { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pdmc__key { color: var(--ink-60); }
+.pdmc__val { color: var(--ink); overflow-wrap: anywhere; }
+.pdmc__about { margin: 0; color: var(--ink-80); line-height: 18px; }
+
+/* связанные компоненты */
+.pdmc__linked { display: flex; flex-direction: column; gap: var(--gap-4); }
+.linked {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-8);
+  padding: 8px;
+  border-radius: var(--r-8);
+  background: var(--ink-04);
+  text-align: left;
+}
+.linked:hover { background: var(--ink-08); }
+.linked__badge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-4);
+  color: #fff;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+.linked__badge--schemes { background: var(--kind-scheme); }
+.linked__badge--interpreters { background: var(--kind-interpreter); }
+.linked__badge--posts { background: var(--kind-post); }
+.linked__badge--kits { background: var(--kind-kit); }
+.linked__text { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+.linked__name { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.linked__sub { color: var(--ink-60); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.linked__price { color: var(--ink-80); white-space: nowrap; flex: 0 0 auto; }
+
 /* ── Правая панель (machine 3064:14827) ──────────────────── */
 .panel {
   width: var(--panel-w);

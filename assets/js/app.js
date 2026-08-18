@@ -163,6 +163,127 @@
     fitEquipment();
   }
 
+  /* ── Панель компонента: шапка + три вкладки ────────────── */
+  function propList(rows) {
+    const box = el('div', 'pdmc__props');
+    rows.forEach(([k, v]) => {
+      const row = el('div', 'pdmc__prop');
+      const key = el('div', 'pdmc__key');
+      key.textContent = k;
+      const val = el('div', 'pdmc__val');
+      val.textContent = v;
+      row.append(key, val);
+      box.appendChild(row);
+    });
+    return box;
+  }
+
+  function block(title, node) {
+    const b = el('div', 'pdmc__block');
+    const t = el('div', 'pdmc__block-title');
+    t.textContent = title;
+    b.append(t, node);
+    return b;
+  }
+
+  function renderDmcPanel(d) {
+    const kindDef = DMC_KINDS.find((k) => k.id === d.kind) || {};
+    const detail = dmcDetail(d);
+
+    $('#pdmc-name').textContent = d.name;
+    $('#pdmc-name').title = d.name;
+
+    const fav = $('#pdmc-fav');
+    fav.classList.toggle('is-on', !!d.favorite);
+    fav.dataset.fav = d.id;
+    fav.setAttribute('aria-label', d.favorite ? 'Убрать из избранного' : 'В избранное');
+    fav.querySelector('img').src = d.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg';
+
+    const badges = $('#pdmc-badges');
+    badges.textContent = '';
+    const kind = el('span', `kind-tag kind-tag--${d.kind}`);
+    kind.textContent = kindDef.chip || '';
+    const tested = el('span', 'tag tag--neutral');
+    tested.textContent = detail.tested;
+    badges.append(kind, tested);
+
+    const publisher = Object.fromEntries(detail.publisher);
+    const n = Number(publisher['Загрузок']);
+    const tail = n % 100 >= 11 && n % 100 <= 14 ? 'загрузок'
+      : n % 10 === 1 ? 'загрузка'
+      : n % 10 >= 2 && n % 10 <= 4 ? 'загрузки'
+      : 'загрузок';
+    $('#pdmc-meta').textContent = `${publisher['Компания']} · ${n} ${tail} · обновлён ${publisher['Обновлён']}`;
+
+    const body = $('#pdmc-body');
+    body.textContent = '';
+
+    if (state.dmcTab === 'about') {
+      const actions = el('div', 'pdmc__actions');
+      const trial = el('button', 'btn btn--dark');
+      trial.type = 'button';
+      trial.textContent = 'Получить пробную';
+      const request = el('button', 'btn');
+      request.type = 'button';
+      request.textContent = 'Запросить постпроцессор';
+      actions.append(trial, request);
+
+      const ask = el('a', 'pdmc__link');
+      ask.href = '#';
+      ask.textContent = 'Спросить о компоненте';
+
+      const priceRow = el('div', 'pdmc__price-row');
+      const priceKey = el('span', 'pdmc__key');
+      priceKey.textContent = 'Цена';
+      const priceVal = el('span', `pdmc__price${d.price ? '' : ' pdmc__price--free'}`);
+      priceVal.textContent = priceLabel(d.price);
+      priceRow.append(priceKey, priceVal);
+
+      const about = el('p', 'pdmc__about');
+      about.textContent = detail.about;
+
+      body.append(actions, ask, priceRow, block('Описание', about), block('Публикация', propList(detail.publisher)));
+    }
+
+    if (state.dmcTab === 'specs') {
+      body.append(
+        block('Станок', propList(detail.machine)),
+        block('Стойка ЧПУ', propList(detail.controller)),
+        block('Проверка', propList([['Тестирование в ENCY', detail.tested]])),
+      );
+    }
+
+    if (state.dmcTab === 'links') {
+      const groups = dmcLinked(d);
+      groups.forEach((g) => {
+        const list = el('div', 'pdmc__linked');
+        g.items.forEach((it) => {
+          const row = el('button', 'linked');
+          row.type = 'button';
+          row.dataset.id = it.id;
+          const badge = el('span', `linked__badge linked__badge--${it.kind}`);
+          badge.textContent = (DMC_KINDS.find((k) => k.id === it.kind) || {}).chip.charAt(0);
+          const text = el('span', 'linked__text');
+          const nm = el('span', 'linked__name');
+          nm.textContent = it.name;
+          const sub = el('span', 'linked__sub');
+          sub.textContent = `${it.control} · ${it.type}`;
+          text.append(nm, sub);
+          const price = el('span', 'linked__price');
+          price.textContent = priceLabel(it.price);
+          row.append(badge, text, price);
+          list.appendChild(row);
+        });
+        body.appendChild(block(g.title, list));
+      });
+      if (!groups.length) {
+        const empty = el('p', 'pdmc__about');
+        empty.textContent = 'Связанных компонентов нет.';
+        body.appendChild(empty);
+      }
+    }
+  }
+
   /* Оснащение держим в одну строку: что не влезло — сворачиваем в тег «+N» */
   function fitEquipment() {
     document.querySelectorAll('.dmc__equipment').forEach((row) => {
@@ -345,6 +466,7 @@
     dmcFilter: 'all',
     dmcKind: 'all',
     dmcSelectedId: 'd01',
+    dmcTab: 'about',
   };
 
   function visibleProjects() {
@@ -375,6 +497,9 @@
 
   function refreshDmc() {
     renderDmcItems(visibleDmc());
+    const selected = DMC_ITEMS.find((d) => d.id === state.dmcSelectedId);
+    if (selected) renderDmcPanel(selected);
+    $('#panel-dmc').classList.toggle('is-hidden', !selected || state.realm !== 'dmc');
   }
 
   function bind() {
@@ -464,6 +589,37 @@
         $('.btn-primary').classList.toggle('is-hidden', !isProjects);
         if (!isProjects) refreshDmc();
       });
+    });
+
+    // вкладки панели компонента
+    document.querySelectorAll('.ptabs__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.dmcTab = btn.dataset.ptab;
+        document.querySelectorAll('.ptabs__btn').forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-selected', String(on));
+        });
+        refreshDmc();
+      });
+    });
+
+    // звезда в шапке панели
+    $('#pdmc-fav').addEventListener('click', (e) => {
+      const item = DMC_ITEMS.find((d) => d.id === e.currentTarget.dataset.fav);
+      item.favorite = !item.favorite;
+      item.groups = item.favorite
+        ? [...item.groups, 'favorite']
+        : item.groups.filter((g) => g !== 'favorite');
+      refreshDmc();
+    });
+
+    // переход по связанному компоненту
+    $('#pdmc-body').addEventListener('click', (e) => {
+      const row = e.target.closest('.linked');
+      if (!row) return;
+      state.dmcSelectedId = row.dataset.id;
+      refreshDmc();
     });
 
     // при изменении ширины пересчитываем, сколько плашек оснащения влезает

@@ -84,4 +84,5 @@
   /* Размеры каркаса */
   --titlebar-h: 44px;
   --panel-w: 360px;
+  --panel-dmc-w: 420px;
 }
