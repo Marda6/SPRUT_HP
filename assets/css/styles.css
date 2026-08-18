@@ -539,6 +539,17 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   top: 50%;
   transform: translate(-50%, -50%);
 }
+/* категория и избранное лежат на превью по нижнему краю */
+.dmc__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-8);
+  padding: 8px 8px 8px 12px;
+}
 /* тело тянется, поэтому разделитель и футер прижаты к низу и стоят на одной
    линии во всех карточках ряда, независимо от длины названия и оснащения */
 .dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); flex: 1 1 auto; padding: 0 8px 0 12px; }
@@ -594,7 +605,9 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 /* на время замера в fitEquipment сжатие выключаем, иначе строка всегда «влезает» */
 .dmc__equipment.is-measuring .tag { flex: 0 0 auto; }
 .dmc__equipment .tag--more { flex: 0 0 auto; color: var(--ink-60); }
-.tag--neutral { border-color: var(--ink-16); background: var(--ink-04); color: var(--ink-80); }
+/* плашка оснащения — серый фон без обводки (бордер прозрачный, чтобы
+   не менялась высота относительно остальных плашек) */
+.tag.tag--neutral { border-color: transparent; background: var(--ink-08); color: var(--ink-80); }
 
 /* Категория компонента — свой цвет у каждой */
 .kind-tag {
@@ -606,11 +619,19 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   white-space: nowrap;
   flex: 0 0 auto;
 }
-.kind-tag--schemes { background: var(--kind-scheme-bg); color: var(--kind-scheme); }
-.kind-tag--interpreters { background: var(--kind-interpreter-bg); color: var(--kind-interpreter); }
-.kind-tag--posts { background: var(--kind-post-bg); color: var(--kind-post); }
-.kind-tag--kits { background: var(--kind-kit-bg); color: var(--kind-kit); }
+/* плотная заливка — плашка лежит на превью и должна читаться сразу */
+.kind-tag { color: #fff; }
+.kind-tag--schemes { background: var(--kind-scheme); }
+.kind-tag--interpreters { background: var(--kind-interpreter); }
+.kind-tag--posts { background: var(--kind-post); }
+.kind-tag--kits { background: var(--kind-kit); }
 .card-foot__spacer { flex: 1 1 auto; }
+/* «В избранное»: у избранных видна всегда, у остальных появляется по ховеру */
+.card-icon--fav { opacity: 0; transition: opacity 0.12s ease; }
+.card-icon--fav.is-on,
+.dmc:hover .card-icon--fav,
+.project:hover .card-icon--fav,
+.card-icon--fav:focus-visible { opacity: 1; }
 
 /* Общие строки карточек */
 .card-meta { display: flex; align-items: center; gap: var(--gap-8); }

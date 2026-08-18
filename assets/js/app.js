@@ -101,6 +101,17 @@
       previewInto(pv, 72, kindDef.icon); // у каждой категории своя иконка превью
       preview.appendChild(pv);
 
+      // категория и избранное — по нижнему краю превью
+      const overlay = el('div', 'dmc__overlay');
+      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
+      kind.textContent = kindDef.chip || '';
+      const fav = iconButton('assets/img/icn-star.svg', d.favorite ? 'Убрать из избранного' : 'В избранное');
+      fav.classList.add('card-icon--fav');
+      if (d.favorite) fav.classList.add('is-on');
+      fav.dataset.fav = d.id;
+      overlay.append(kind, el('span', 'card-foot__spacer'), fav);
+      preview.appendChild(overlay);
+
       const body = el('div', 'dmc__body');
       const head = el('div', 'dmc__head');
       const name = el('h3', 'dmc__name');
@@ -140,17 +151,7 @@
 
       body.append(head, props);
 
-      // футер: категория слева, избранное и действия справа
-      const foot = el('div', 'card-foot');
-      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
-      kind.textContent = kindDef.chip || '';
-      const spacer = el('span', 'card-foot__spacer');
-      const actions = el('div', 'card-foot__actions');
-      if (d.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранном'));
-      actions.appendChild(iconButton('assets/img/icn-kebab.svg', 'Действия'));
-      foot.append(kind, spacer, actions);
-
-      card.append(preview, body, el('div', 'card-divider'), foot);
+      card.append(preview, body);
       host.appendChild(card);
     });
     fitEquipment();
@@ -234,8 +235,12 @@
       const location = el('span', 'card-foot__text'); // где лежит проект
       location.textContent = p.location;
       const actions = el('div', 'card-foot__actions');
-      if (p.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранное'));
-      actions.appendChild(iconButton('assets/img/icn-kebab.svg', 'Действия'));
+      // звезда всегда в разметке: у избранных видна, у остальных — по ховеру
+      const fav = iconButton('assets/img/icn-star.svg', p.favorite ? 'Убрать из избранного' : 'В избранное');
+      fav.classList.add('card-icon--fav');
+      if (p.favorite) fav.classList.add('is-on');
+      fav.dataset.fav = p.id;
+      actions.append(fav, iconButton('assets/img/icn-kebab.svg', 'Действия'));
       foot.append(location, actions);
 
       col.append(top, el('div', 'card-divider'), foot);
@@ -369,9 +374,19 @@
   function bind() {
     // выбор карточки → панель свойств
     $('#projects').addEventListener('click', (e) => {
+      const star = e.target.closest('.card-icon--fav');
+      if (star) {
+        const item = PROJECTS.find((p) => p.id === star.dataset.fav);
+        item.favorite = !item.favorite;
+        item.groups = item.favorite
+          ? [...item.groups, 'favorite']
+          : item.groups.filter((g) => g !== 'favorite');
+        refresh();
+        return;
+      }
       const card = e.target.closest('.project');
       if (!card) return;
-      if (e.target.closest('.card-icon')) return; // кебаб/звезда не меняют выбор
+      if (e.target.closest('.card-icon')) return; // кебаб не меняет выбор
       state.selectedId = card.dataset.id;
       refresh();
     });
@@ -396,8 +411,18 @@
       });
     });
 
-    // выбор компонента
+    // выбор компонента и переключение избранного
     $('#dmc-items').addEventListener('click', (e) => {
+      const star = e.target.closest('.card-icon--fav');
+      if (star) {
+        const item = DMC_ITEMS.find((d) => d.id === star.dataset.fav);
+        item.favorite = !item.favorite;
+        item.groups = item.favorite
+          ? [...item.groups, 'favorite']
+          : item.groups.filter((g) => g !== 'favorite');
+        refreshDmc();
+        return;
+      }
       const card = e.target.closest('.dmc');
       if (!card || e.target.closest('.card-icon')) return;
       state.dmcSelectedId = card.dataset.id;
