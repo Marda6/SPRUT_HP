@@ -19,7 +19,10 @@ createServer(async (req, res) => {
   const file = join(root, normalize(p));
   try {
     const body = await readFile(file);
-    res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'Content-Type': types[extname(file)] || 'application/octet-stream',
+      'Cache-Control': 'no-store', // иначе браузер держит старые css/js
+    });
     res.end(body);
   } catch {
     res.writeHead(404).end('not found');

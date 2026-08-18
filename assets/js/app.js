@@ -254,6 +254,25 @@
       refresh();
     });
 
+    // разделы библиотеки: Проекты / Цифровое оборудование
+    document.querySelectorAll('.seg__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const isProjects = btn.dataset.realm === 'projects';
+        document.querySelectorAll('.seg__btn').forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-selected', String(on));
+        });
+        // фильтры, подборки и сетка проектов относятся только к «Проектам»
+        $('.chips').classList.toggle('is-hidden', !isProjects);
+        document.querySelectorAll('.content > .section:not(#realm-dmc)').forEach((s) => {
+          s.classList.toggle('is-hidden', !isProjects);
+        });
+        $('#realm-dmc').classList.toggle('is-hidden', isProjects);
+        $('#panel').classList.toggle('is-hidden', !isProjects);
+      });
+    });
+
     // табы проектов в титульной строке
     document.querySelectorAll('.tab').forEach((tab) => {
       tab.addEventListener('click', (e) => {

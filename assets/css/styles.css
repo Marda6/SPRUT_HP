@@ -218,6 +218,47 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   padding: 0 12px;
   flex: 0 0 auto;
 }
+.toolbar__title { display: flex; align-items: center; gap: var(--gap-16); min-width: 0; }
+
+/* Разделы библиотеки — второй уровень навигации.
+   Подложка светлее и активный сегмент белый, чтобы не спорить с тёмным
+   активным табом верхней навигации. */
+.seg {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  padding: 2px;
+  border-radius: var(--r-8);
+  background: var(--ink-08);
+  flex: 0 0 auto;
+}
+.seg__btn {
+  display: flex;
+  align-items: center;
+  height: var(--control-h);
+  padding: 0 12px;
+  border-radius: var(--r-6);
+  color: var(--ink-80);
+  white-space: nowrap;
+}
+.seg__btn:hover { color: var(--ink); }
+.seg__btn.is-active {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+  box-shadow: var(--card-shadow);
+}
+
+/* Заглушка ещё не собранного раздела */
+.empty {
+  align-items: center;
+  gap: var(--gap-4);
+  padding: 64px 16px;
+  text-align: center;
+}
+.empty__title { margin: 0; font-size: 16px; line-height: 24px; font-weight: 500; color: var(--ink); }
+.empty__text { margin: 0; color: var(--ink-60); }
+
 .page-title {
   margin: 0;
   font-size: 24px;
@@ -238,8 +279,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  padding: 8px 20px;
+  height: var(--control-h);
+  padding: 0 16px;
   border-radius: var(--r-4);
   background: var(--bar);
   color: var(--on-bar);
@@ -254,8 +295,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   justify-content: space-between;
   flex: 1 1 auto;
   min-width: 0;
-  height: 40px;
-  padding: 6px 12px;
+  height: var(--control-h);
+  padding: 0 12px;
   border: 1px solid var(--ink-16);
   border-radius: var(--r-6);
   background: var(--surface);
@@ -276,8 +317,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   display: flex;
   align-items: center;
   gap: var(--gap-8);
-  height: 40px;
-  padding: 6px 12px 6px 16px;
+  height: var(--control-h);
+  padding: 0 10px 0 12px;
   border: 1px solid var(--ink-08);
   border-radius: var(--r-6);
   background: var(--ink-04);
@@ -289,8 +330,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .chip-filter {
   display: flex;
   align-items: center;
-  height: 40px;
-  padding: 6px 16px;
+  height: var(--control-h);
+  padding: 0 16px;
   border: 1px solid var(--ink-08);
   border-radius: var(--r-pill);
   background: var(--ink-04);

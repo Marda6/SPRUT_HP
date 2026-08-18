@@ -86,7 +86,14 @@
 
       <!-- Заголовок и тулбар (3064:14760) -->
       <div class="toolbar">
-        <h1 class="page-title">Библиотека</h1>
+        <div class="toolbar__title">
+          <h1 class="page-title">Библиотека</h1>
+          <!-- Разделы библиотеки. Второй уровень навигации: Библиотека → раздел -->
+          <div class="seg" role="tablist" aria-label="Раздел библиотеки">
+            <button class="seg__btn is-active" type="button" role="tab" aria-selected="true" data-realm="projects">Проекты</button>
+            <button class="seg__btn" type="button" role="tab" aria-selected="false" data-realm="dmc" title="Digital Machine Centre">Цифровое оборудование</button>
+          </div>
+        </div>
         <div class="toolbar__actions">
           <button class="btn-primary" type="button">Загрузить проект</button>
           <label class="search">
@@ -127,6 +134,12 @@
           <h2 class="section__title">Проекты</h2>
         </div>
         <div class="grid" id="projects"></div>
+      </section>
+
+      <!-- Раздел «Цифровое оборудование» — содержимое ещё не спроектировано -->
+      <section class="section empty is-hidden" id="realm-dmc">
+        <p class="empty__title">Цифровое оборудование</p>
+        <p class="empty__text">Здесь будут схемы станков, интерпретаторы и постпроцессоры. Раздел ещё не собран.</p>
       </section>
 
     </main>
