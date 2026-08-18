@@ -599,13 +599,16 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .dmc__equipment { display: flex; align-items: center; gap: var(--gap-4); overflow: hidden; white-space: nowrap; }
 /* плашки в 20px, чтобы строка оснащения не ломала ритм остальных строк;
    видимая плашка при нехватке места усекается троеточием, а не режется по краю */
-.dmc__equipment .tag { height: 20px; padding: 0 6px; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* геометрия та же, что у плашки категории: 20px, padding 8, radius 4 */
+.dmc__equipment .tag { height: 20px; padding: 0 8px; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* на время замера в fitEquipment сжатие выключаем, иначе строка всегда «влезает» */
 .dmc__equipment.is-measuring .tag { flex: 0 0 auto; }
 .dmc__equipment .tag--more { flex: 0 0 auto; color: var(--ink-60); }
 /* плашка оснащения — серый фон без обводки (бордер прозрачный, чтобы
    не менялась высота относительно остальных плашек) */
-.tag.tag--neutral { border-color: transparent; background: var(--ink-08); color: var(--ink-80); }
+/* без бордера вообще: у плашки категории его нет, и прозрачная рамка давала
+   разную геометрию скругления при одинаковом radius */
+.tag.tag--neutral { border: 0; background: var(--ink-08); color: var(--ink-80); }
 
 /* Категория компонента — свой цвет у каждой. Радиус 4px, как у остальных
    тегов: pill в системе только у чипов-фильтров. */
