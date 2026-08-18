@@ -1,0 +1,8 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Заглушка: превью комплекта — три слоя. В Figma глифа пока нет. -->
+<g stroke="#091E33" stroke-opacity="0.25" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M24 7L41 15.5L24 24L7 15.5L24 7Z"/>
+<path d="M7 24L24 32.5L41 24"/>
+<path d="M7 32.5L24 41L41 32.5"/>
+</g>
+</svg>

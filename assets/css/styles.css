@@ -572,6 +572,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  min-height: 40px; /* место под две строки — чтобы свойства начинались на одной линии */
   overflow: hidden;
   overflow-wrap: anywhere;
 }
@@ -580,27 +581,35 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .dmc .prop__value { text-align: left; }
 .dmc .prop__key,
 .dmc .prop__value { padding: 2px 0; }
+/* подпись по центру относительно значения — важно для строки с плашками */
+.dmc .prop { align-items: center; }
+/* строка оснащения без вертикальных отступов: плашка 20px = высота обычной
+   строки, иначе карточки с оснащением выше остальных на 4px */
+.dmc .dmc__equipment { padding-top: 0; padding-bottom: 0; }
 /* одна строка: лишние плашки сворачиваются в «+N» (см. fitEquipment) */
 .dmc__equipment { display: flex; align-items: center; gap: var(--gap-4); overflow: hidden; white-space: nowrap; }
-/* видимая плашка при нехватке места усекается троеточием, а не режется по краю */
-.dmc__equipment .tag { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* плашки в 20px, чтобы строка оснащения не ломала ритм остальных строк;
+   видимая плашка при нехватке места усекается троеточием, а не режется по краю */
+.dmc__equipment .tag { height: 20px; flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 /* на время замера в fitEquipment сжатие выключаем, иначе строка всегда «влезает» */
 .dmc__equipment.is-measuring .tag { flex: 0 0 auto; }
 .dmc__equipment .tag--more { flex: 0 0 auto; color: var(--ink-60); }
 .tag--neutral { border-color: var(--ink-16); background: var(--ink-04); color: var(--ink-80); }
 
-/* Категория компонента и его состояние */
+/* Категория компонента — свой цвет у каждой */
 .kind-tag {
   display: flex;
   align-items: center;
   height: 24px;
   padding: 0 8px;
   border-radius: var(--r-pill);
-  background: var(--ok-08);
-  color: var(--ok);
   white-space: nowrap;
   flex: 0 0 auto;
 }
+.kind-tag--schemes { background: var(--kind-scheme-bg); color: var(--kind-scheme); }
+.kind-tag--interpreters { background: var(--kind-interpreter-bg); color: var(--kind-interpreter); }
+.kind-tag--posts { background: var(--kind-post-bg); color: var(--kind-post); }
+.kind-tag--kits { background: var(--kind-kit-bg); color: var(--kind-kit); }
 .card-foot__spacer { flex: 1 1 auto; }
 
 /* Общие строки карточек */

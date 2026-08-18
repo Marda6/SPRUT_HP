@@ -21,12 +21,12 @@
     return icon;
   }
 
-  /* Превью: заглушка «3D-модель» вместо рендера детали */
-  function previewInto(host, size) {
+  /* Превью: иконка-заглушка (у компонентов — своя на категорию) */
+  function previewInto(host, size, src = PREVIEW_ICON) {
     host.textContent = '';
     const img = el('img');
-    img.src = PREVIEW_ICON;
-    img.alt = '3D-модель';
+    img.src = src;
+    img.alt = '';
     img.width = size;
     img.height = size;
     host.appendChild(img);
@@ -94,9 +94,11 @@
       card.dataset.id = d.id;
       if (d.selected) card.classList.add('is-selected');
 
+      const kindDef = DMC_KINDS.find((k) => k.id === d.kind) || {};
+
       const preview = el('div', 'dmc__preview');
       const pv = el('span', 'pv');
-      previewInto(pv, 72);
+      previewInto(pv, 72, kindDef.icon); // у каждой категории своя иконка превью
       preview.appendChild(pv);
 
       const body = el('div', 'dmc__body');
@@ -109,41 +111,39 @@
       price.textContent = priceLabel(d.price);
       head.append(name, price);
 
+      // набор полей зависит от категории; высота зарезервирована под максимум,
+      // чтобы карточки разных категорий не скакали по высоте
       const props = el('div', 'dmc__props');
-      [['Стойка ЧПУ', d.control], ['Тип', d.type], ['Оси', d.axes], ['Рабочая зона, мм', d.area]]
-        .forEach(([k, v]) => {
-          const row = el('div', 'prop');
-          const key = el('div', 'prop__key');
-          key.textContent = k;
-          const val = el('div', 'prop__value');
-          val.textContent = v;
-          row.append(key, val);
-          props.appendChild(row);
-        });
-      // «Оснащение» — та же строка, но значение набором тэгов
-      const eq = el('div', 'prop');
-      const eqKey = el('div', 'prop__key');
-      eqKey.textContent = 'Оснащение';
-      const eqVal = el('div', 'prop__value dmc__equipment');
-      if (!d.equipment.length) {
-        eqVal.textContent = '—';
-      } else {
-        d.equipment.forEach((t) => {
-          const tag = el('span', 'tag tag--neutral');
-          tag.textContent = t;
-          tag.title = t;
-          eqVal.appendChild(tag);
-        });
-      }
-      eq.append(eqKey, eqVal);
-      props.appendChild(eq);
+      props.style.minHeight = `${DMC_MAX_FIELDS * 20}px`;
+      (kindDef.fields || []).forEach((field) => {
+        const row = el('div', 'prop');
+        const key = el('div', 'prop__key');
+        key.textContent = DMC_FIELD_LABEL[field];
+        const val = el('div', field === 'equipment' ? 'prop__value dmc__equipment' : 'prop__value');
+        if (field === 'equipment') {
+          if (!d.equipment.length) {
+            val.textContent = '—';
+          } else {
+            d.equipment.forEach((t) => {
+              const tag = el('span', 'tag tag--neutral');
+              tag.textContent = t;
+              tag.title = t;
+              val.appendChild(tag);
+            });
+          }
+        } else {
+          val.textContent = d[field] || '—';
+        }
+        row.append(key, val);
+        props.appendChild(row);
+      });
 
       body.append(head, props);
 
       // футер: категория слева, избранное и действия справа
       const foot = el('div', 'card-foot');
-      const kind = el('span', 'kind-tag');
-      kind.textContent = (DMC_KINDS.find((k) => k.id === d.kind) || {}).chip || '';
+      const kind = el('span', `kind-tag kind-tag--${d.kind}`);
+      kind.textContent = kindDef.chip || '';
       const spacer = el('span', 'card-foot__spacer');
       const actions = el('div', 'card-foot__actions');
       if (d.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранном'));

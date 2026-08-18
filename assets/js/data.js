@@ -25,34 +25,54 @@ const STATUS = {
 };
 
 /* Категории раздела «Цифровое оборудование». Количество считается из DMC_ITEMS.
+   У каждой категории свой цвет плашки, своя иконка превью и свой набор полей.
    Kit — схема, интерпретатор и постпроцессор в одном комплекте. */
 const DMC_KINDS = [
   { id: 'all', label: 'Все категории' },
-  { id: 'schemes', label: 'Схемы', chip: 'Схема станка' },
-  { id: 'interpreters', label: 'Интерпретаторы', chip: 'Интерпретатор' },
-  { id: 'posts', label: 'Постпроцессоры', chip: 'Постпроцессор' },
-  { id: 'kits', label: 'Комплекты', chip: 'Комплект', hint: 'Kit — схема, интерпретатор и постпроцессор в одном комплекте' },
+  { id: 'schemes', label: 'Схемы', chip: 'Схема станка', icon: 'assets/img/icn-3d-model.svg',
+    fields: ['control', 'type', 'axes', 'area', 'equipment'] },
+  { id: 'interpreters', label: 'Интерпретаторы', chip: 'Интерпретатор', icon: 'assets/img/icn-terminal.svg',
+    fields: ['control', 'machine', 'type', 'axes'] },
+  { id: 'posts', label: 'Постпроцессоры', chip: 'Постпроцессор', icon: 'assets/img/icn-code.svg',
+    fields: ['control', 'machine', 'type', 'axes'] },
+  { id: 'kits', label: 'Комплекты', chip: 'Комплект', icon: 'assets/img/icn-kit.svg',
+    fields: ['control', 'machine', 'type', 'axes', 'area', 'equipment'],
+    hint: 'Kit — схема, интерпретатор и постпроцессор в одном комплекте' },
 ];
+
+/* Подписи полей карточки компонента */
+const DMC_FIELD_LABEL = {
+  control: 'Стойка ЧПУ',
+  machine: 'Станок',
+  type: 'Тип',
+  axes: 'Оси',
+  area: 'Рабочая зона, мм',
+  equipment: 'Оснащение',
+};
+
+/* Самый полный набор — по нему резервируется высота, чтобы карточки разных
+   категорий не скакали по высоте в одном ряду */
+const DMC_MAX_FIELDS = 6;
 
 /* Компоненты цифрового оборудования. Состав полей — как в референсе карточки:
    стойка, тип, оси, рабочая зона, оснащение. */
 const DMC_ITEMS = [
   { id: 'd01', price: 0, name: 'Makino DA 90',        kind: 'schemes',       control: 'Okuma',        type: 'Mill Turn',   axes: '6+',  area: '830 × 480 × 730',  equipment: ['Барфидер', 'Приводной инструмент'], status: 'public',       favorite: true },
-  { id: 'd02', price: 148000, name: 'Mori Seiki NT 4250',  kind: 'kits',          control: 'Fanuc 31i',    type: 'Mill Turn',   axes: '9',   area: '1250 × 660 × 700', equipment: ['Барфидер', 'Противошпиндель', 'Люнет', 'Приводной инструмент'],       status: 'public' },
+  { id: 'd02', price: 148000, name: 'Mori Seiki NT 4250',  kind: 'kits',          control: 'Fanuc 31i', machine: 'Mori Seiki NT 4250',    type: 'Mill Turn',   axes: '9',   area: '1250 × 660 × 700', equipment: ['Барфидер', 'Противошпиндель', 'Люнет', 'Приводной инструмент'],       status: 'public' },
   { id: 'd03', price: 0, name: 'DMG MORI DMU 50',     kind: 'schemes',       control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '650 × 520 × 475',  equipment: ['Поворотный стол', 'СОЖ через шпиндель', 'Измерительный щуп'],       status: 'public' },
   { id: 'd04', price: 'support', name: 'Haas VF-2SS',         kind: 'schemes',       control: 'Haas NGC',     type: '3X Mill',     axes: '3',   area: '760 × 410 × 510',  equipment: ['СОЖ через шпиндель'],       status: 'sharedWithMe' },
   { id: 'd05', price: 96000, name: 'Okuma LB3000 EX',     kind: 'schemes',       control: 'Okuma OSP',    type: 'Turning',     axes: '4',   area: 'Ø410 × 1000',      equipment: ['Барфидер', 'Люнет', 'Противошпиндель'],       status: 'public' },
-  { id: 'd06', price: 'support', name: 'Fanuc 31i Mill Turn', kind: 'interpreters',  control: 'Fanuc 31i',    type: 'Mill Turn',   axes: '6+',  area: '—',                equipment: ['Циклы сверления', 'TCPM'],       status: 'public',       favorite: true },
-  { id: 'd07', price: 'support', name: 'Siemens 840D sl',     kind: 'interpreters',  control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы фрезерования', 'TRAORI'],       status: 'public' },
-  { id: 'd08', price: 0, name: 'Heidenhain TNC 640',  kind: 'interpreters',  control: 'TNC 640',      type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы измерения'], status: 'private' },
-  { id: 'd09', price: 24500, name: 'Fanuc 0i-MF post',    kind: 'posts',         control: 'Fanuc 0i-MF',  type: '3X Mill',     axes: '3',   area: '—',                equipment: ['G54.1', 'Подпрограммы'],       status: 'sharedByMe' },
-  { id: 'd10', price: 0, name: 'Sinumerik 828D post', kind: 'posts',         control: 'Sinumerik 828D', type: 'Turning',   axes: '4',   area: '—',                equipment: ['Циклы точения'],       status: 'private' },
-  { id: 'd11', price: 39000, name: 'Mazak Smooth G post', kind: 'posts',         control: 'Smooth G',     type: 'Mill Turn',   axes: '9',   area: '—',                equipment: ['Синхронизация каналов'], status: 'sharedByMe',   favorite: true },
-  { id: 'd12', price: 210000, name: 'Grob G350 kit',       kind: 'kits',          control: 'Siemens 840D', type: '5X Mill',     axes: '5',   area: '700 × 800 × 900',  equipment: ['Паллеты', 'Поворотный стол', 'Измерительный щуп', 'Смена инструмента'],       status: 'public' },
+  { id: 'd06', price: 'support', name: 'Fanuc 31i Mill Turn', kind: 'interpreters',  control: 'Fanuc 31i', machine: 'DMG MORI NTX 300',    type: 'Mill Turn',   axes: '6+',  area: '—',                equipment: ['Циклы сверления', 'TCPM'],       status: 'public',       favorite: true },
+  { id: 'd07', price: 'support', name: 'Siemens 840D sl',     kind: 'interpreters',  control: 'Siemens 840D', machine: 'Hermle C42 U', type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы фрезерования', 'TRAORI'],       status: 'public' },
+  { id: 'd08', price: 0, name: 'Heidenhain TNC 640',  kind: 'interpreters',  control: 'TNC 640', machine: 'Hyundai WIA L 95',      type: '5X Mill',     axes: '5',   area: '—',                equipment: ['Циклы измерения'], status: 'private' },
+  { id: 'd09', price: 24500, name: 'Fanuc 0i-MF post',    kind: 'posts',         control: 'Fanuc 0i-MF', machine: 'Haas VF-2SS',  type: '3X Mill',     axes: '3',   area: '—',                equipment: ['G54.1', 'Подпрограммы'],       status: 'sharedByMe' },
+  { id: 'd10', price: 0, name: 'Sinumerik 828D post', kind: 'posts',         control: 'Sinumerik 828D', machine: 'Doosan Puma 2600', type: 'Turning',   axes: '4',   area: '—',                equipment: ['Циклы точения'],       status: 'private' },
+  { id: 'd11', price: 39000, name: 'Mazak Smooth G post', kind: 'posts',         control: 'Smooth G', machine: 'Mazak Integrex i-200',     type: 'Mill Turn',   axes: '9',   area: '—',                equipment: ['Синхронизация каналов'], status: 'sharedByMe',   favorite: true },
+  { id: 'd12', price: 210000, name: 'Grob G350 kit',       kind: 'kits',          control: 'Siemens 840D', machine: 'Grob G350', type: '5X Mill',     axes: '5',   area: '700 × 800 × 900',  equipment: ['Паллеты', 'Поворотный стол', 'Измерительный щуп', 'Смена инструмента'],       status: 'public' },
   { id: 'd13', price: 0, name: 'Hermle C42 U',        kind: 'schemes',       control: 'TNC 640',      type: '5X Mill',     axes: '5',   area: '800 × 800 × 550',  equipment: ['Поворотный стол', 'Приводной инструмент', 'СОЖ через шпиндель'],       status: 'sharedWithMe' },
   { id: 'd14', price: 0, name: 'Doosan Puma 2600',    kind: 'schemes',       control: 'Fanuc 31i',    type: 'Turning',     axes: '3',   area: 'Ø460 × 700',       equipment: [],  status: 'public' },
   { id: 'd15', price: 132000, name: 'Sodick AQ537L',       kind: 'schemes',       control: 'Sodick LN2',   type: 'Wire EDM',    axes: '4',   area: '500 × 370 × 300',  equipment: ['Автозаправка проволоки'],       status: 'public' },
-  { id: 'd16', price: 'support', name: 'Haas ST-20 post',     kind: 'posts',         control: 'Haas NGC',     type: 'Turning',     axes: '2',   area: '—',                equipment: ['Циклы точения'],       status: 'private' },
+  { id: 'd16', price: 'support', name: 'Haas ST-20 post',     kind: 'posts',         control: 'Haas NGC', machine: 'Haas ST-20',     type: 'Turning',     axes: '2',   area: '—',                equipment: ['Циклы точения'],       status: 'private' },
 ].map((d) => {
   // чипы доступа: «Мои компоненты» = приватные и те, которыми я поделился
   const groups = [];
