@@ -120,18 +120,16 @@
         <button class="chip" type="button" data-filter="shared">Доступные мне</button>
       </div>
 
-      <!-- Цифровое оборудование: доступ + категории компонентов -->
-      <div class="chips is-hidden" id="chips-dmc-access" role="group" aria-label="Фильтры компонентов">
-        <button class="chip is-active" type="button" data-filter="all">Все</button>
-        <button class="chip" type="button" data-filter="mine">Мои компоненты</button>
-        <button class="chip" type="button" data-filter="favorite">Избранные</button>
-      </div>
-      <div class="chips is-hidden" id="chips-dmc-kind" role="group" aria-label="Категории компонентов">
-        <button class="chip is-active" type="button" data-kind="all">Все категории</button>
-        <button class="chip" type="button" data-kind="schemes">Схемы</button>
-        <button class="chip" type="button" data-kind="interpreters">Интерпретаторы</button>
-        <button class="chip" type="button" data-kind="posts">Постпроцессоры</button>
-        <button class="chip" type="button" data-kind="kits" title="Kit — схема, интерпретатор и постпроцессор в одном комплекте">Комплекты</button>
+      <!-- Цифровое оборудование: доступ и категории — один ряд, две группы -->
+      <div class="chips is-hidden" id="chips-dmc">
+        <span class="chips__set" role="group" aria-label="Фильтры компонентов">
+          <button class="chip is-active" type="button" data-filter="all">Все</button>
+          <button class="chip" type="button" data-filter="mine">Мои компоненты</button>
+          <button class="chip" type="button" data-filter="favorite">Избранные</button>
+        </span>
+        <span class="chips__sep"></span>
+        <!-- категории с количеством компонентов — рендерятся из DMC_KINDS -->
+        <span class="chips__set" id="chips-dmc-kind" role="group" aria-label="Категории компонентов"></span>
       </div>
 
       <!-- Подборки (3064:15497) -->

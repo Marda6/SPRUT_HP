@@ -13,23 +13,12 @@
      layers — глиф «Access project» из Figma (4 слоя), icon — одиночный глиф. */
   function statusIcon(status) {
     const s = STATUS[status] || STATUS.public;
-    const wrap = el('span', 'access');
-    wrap.title = s.label;
-    wrap.setAttribute('aria-label', s.label);
-    if (s.layers) {
-      for (let i = 1; i <= 4; i++) {
-        const img = el('img', `access__layer access__layer--${i}`);
-        img.src = `assets/img/access-${s.layers}-${i}.svg`;
-        img.alt = '';
-        wrap.appendChild(img);
-      }
-    } else {
-      const img = el('img', 'access__single');
-      img.src = s.icon;
-      img.alt = '';
-      wrap.appendChild(img);
-    }
-    return wrap;
+    const key = STATUS[status] ? status : 'public';
+    const icon = el('span', `status-icon status-icon--${key}`);
+    icon.title = s.label;
+    icon.setAttribute('role', 'img');
+    icon.setAttribute('aria-label', s.label);
+    return icon;
   }
 
   /* Превью: заглушка «3D-модель» вместо рендера детали */
@@ -64,6 +53,24 @@
     img.alt = '';
     btn.appendChild(img);
     return btn;
+  }
+
+  /* ── Категории «Цифрового оборудования» ────────────────── */
+  function renderKindChips() {
+    const host = $('#chips-dmc-kind');
+    host.textContent = '';
+    DMC_KINDS.forEach((k, i) => {
+      const chip = el('button', i === 0 ? 'chip is-active' : 'chip');
+      chip.type = 'button';
+      chip.dataset.kind = k.id;
+      if (k.hint) chip.title = k.hint;
+      const label = el('span');
+      label.textContent = k.label;
+      const count = el('span', 'chip__count');
+      count.textContent = k.count;
+      chip.append(label, count);
+      host.appendChild(chip);
+    });
   }
 
   /* ── Подборки ──────────────────────────────────────────── */
@@ -243,7 +250,9 @@
       row.addEventListener('click', (e) => {
         const chip = e.target.closest('.chip');
         if (!chip) return;
-        row.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
+        // активный выбирается внутри своей группы (доступ / категории)
+        const set = chip.closest('.chips__set') || row;
+        set.querySelectorAll('.chip').forEach((c) => c.classList.remove('is-active'));
         chip.classList.add('is-active');
         // фильтруем только проекты — данных по компонентам DMC пока нет
         if (row.id === 'chips-projects') {
@@ -270,8 +279,7 @@
         });
         // у каждого раздела свои ряды чипов
         $('#chips-projects').classList.toggle('is-hidden', !isProjects);
-        $('#chips-dmc-access').classList.toggle('is-hidden', isProjects);
-        $('#chips-dmc-kind').classList.toggle('is-hidden', isProjects);
+        $('#chips-dmc').classList.toggle('is-hidden', isProjects);
         document.querySelectorAll('.content > .section:not(#realm-dmc)').forEach((s) => {
           s.classList.toggle('is-hidden', !isProjects);
         });
@@ -292,6 +300,7 @@
   }
 
   renderCollections();
+  renderKindChips();
   bind();
   refresh();
 })();
