@@ -21,25 +21,14 @@
     return wrap;
   }
 
-  /* Превью детали: внешний бокс и кроп — точно по макету */
-  function previewInto(host, part) {
+  /* Превью: заглушка «3D-модель» вместо рендера детали */
+  function previewInto(host, size) {
     host.textContent = '';
-    host.style.width = part.w + 'px';
-    host.style.height = part.h + 'px';
     const img = el('img');
-    img.src = part.src;
-    img.alt = '';
-    if (part.crop) {
-      img.style.width = part.crop.w + '%';
-      img.style.height = part.crop.h + '%';
-      img.style.left = part.crop.l + '%';
-      img.style.top = part.crop.t + '%';
-    } else {
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.left = '0';
-      img.style.top = '0';
-    }
+    img.src = PREVIEW_ICON;
+    img.alt = '3D-модель';
+    img.width = size;
+    img.height = size;
     host.appendChild(img);
   }
 
@@ -103,7 +92,7 @@
 
       const preview = el('div', 'project__preview');
       const pv = el('span', 'pv');
-      previewInto(pv, PARTS[p.part]);
+      previewInto(pv, 48);
       preview.appendChild(pv);
 
       const col = el('div', 'project__col');
@@ -129,13 +118,20 @@
 
   /* ── Правая панель ─────────────────────────────────────── */
   function renderPanel(p) {
-    previewInto($('#panel-preview'), PANEL_PART);
+    previewInto($('#panel-preview'), 96);
     $('#panel-name').textContent = p.name;
-    $('#panel-visibility').textContent = INFO_DEFAULT.visibility;
+    $('#panel-visibility').textContent = p.visibility;
 
     const props = $('#panel-props');
     props.textContent = '';
-    INFO_DEFAULT.props.forEach(([k, v]) => {
+    [
+      ['Разработчик', p.dev],
+      ['ID номер', p.num],
+      ['Дата', p.date],
+      ['Тип оборудования', p.type],
+      ['Модель', p.machine],
+      ['Размер файла', p.size],
+    ].forEach(([k, v]) => {
       const row = el('div', 'prop');
       const key = el('div', 'prop__key');
       key.textContent = k;
@@ -147,7 +143,7 @@
 
     const axes = $('#panel-axes');
     axes.textContent = '';
-    INFO_DEFAULT.axes.forEach((a) => {
+    p.axes.forEach((a) => {
       const t = el('span', 'tag');
       t.textContent = a;
       axes.appendChild(t);
@@ -155,7 +151,7 @@
 
     const tags = $('#panel-tags');
     tags.textContent = '';
-    INFO_DEFAULT.tags.forEach((t) => {
+    p.tags.forEach((t) => {
       const n = el('span', 'tag tag--solid');
       n.textContent = t;
       tags.appendChild(n);
@@ -163,7 +159,7 @@
 
     const users = $('#panel-users');
     users.textContent = '';
-    INFO_DEFAULT.users.forEach((u) => {
+    p.users.forEach((u) => {
       const row = el('div', 'user');
       const id = el('div', 'user__id');
       const name = el('span', 'user__name');
