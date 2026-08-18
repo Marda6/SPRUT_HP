@@ -441,9 +441,14 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   line-height: 20px;
   font-weight: 500;
   color: var(--ink);
+  /* до двух строк, дальше — троеточие; высота заложена всегда,
+     чтобы мета-строка не прыгала между карточками */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 40px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 /* Общие строки карточек */
@@ -524,7 +529,18 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   justify-content: space-between;
   padding: 8px 12px;
 }
-.panel__name { margin: 0; font-size: 16px; line-height: 20px; font-weight: 500; color: var(--n-800); }
+.panel__name {
+  margin: 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--n-800);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
 .panel__visibility { display: flex; align-items: center; gap: var(--gap-8); color: var(--n-900); }
 .panel__visibility img { margin: 4px; } /* глиф 16px в боксе 24px */
 

@@ -100,6 +100,7 @@
       const top = el('div', 'project__top');
       const name = el('h3', 'project__name');
       name.textContent = p.name;
+      name.title = p.name; // полное имя, если обрезано двумя строками
       top.append(name, metaRow(p.changed, p.access));
 
       const foot = el('div', 'card-foot');
@@ -120,6 +121,7 @@
   function renderPanel(p) {
     previewInto($('#panel-preview'), 96);
     $('#panel-name').textContent = p.name;
+    $('#panel-name').title = p.name;
     $('#panel-visibility').textContent = p.visibility;
 
     const props = $('#panel-props');
