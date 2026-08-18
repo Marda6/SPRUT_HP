@@ -161,6 +161,10 @@
 
     <!-- ── Панель компонента DMC ───────────────────────────── -->
     <aside class="panel panel--dmc is-hidden" id="panel-dmc" aria-label="Свойства компонента">
+      <div class="pdmc__preview">
+        <span class="pv" id="pdmc-preview"></span>
+      </div>
+
       <div class="pdmc__head">
         <div class="pdmc__title">
           <h2 class="pdmc__name" id="pdmc-name"></h2>
@@ -171,6 +175,10 @@
         <div class="pdmc__badges" id="pdmc-badges"></div>
         <div class="pdmc__meta" id="pdmc-meta"></div>
       </div>
+
+      <!-- кнопки и цена закреплены над вкладками: получить пробную можно
+           с любой вкладки -->
+      <div class="pdmc__cta" id="pdmc-cta"></div>
 
       <div class="ptabs" role="tablist" aria-label="Разделы компонента">
         <button class="ptabs__btn is-active" type="button" role="tab" aria-selected="true" data-ptab="about">Обзор</button>

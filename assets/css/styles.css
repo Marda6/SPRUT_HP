@@ -709,7 +709,10 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   color: var(--ink);
 }
 .pdmc__badges { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-8); }
-.pdmc__meta { color: var(--ink-60); }
+.pdmc__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-8); color: var(--ink-60); }
+.pdmc__meta-sep { width: 1px; height: 12px; background: var(--ink-16); flex: 0 0 auto; }
+/* кнопки и цена закреплены над вкладками */
+.pdmc__cta { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 0 auto; }
 
 /* вкладки панели */
 .ptabs {
@@ -734,18 +737,23 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .ptabs__btn:hover { color: var(--ink); }
 .ptabs__btn.is-active { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: var(--card-shadow); }
 
-.pdmc__actions { display: flex; flex-direction: column; gap: var(--gap-8); }
-.pdmc__actions .btn { padding: 8px 16px; }
-.pdmc__link { color: var(--accent); }
-.pdmc__link:hover { text-decoration: underline; }
-.pdmc__price-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+/* превью компонента над шапкой */
+.pdmc__preview {
+  position: relative;
+  height: 160px;
+  flex: 0 0 auto;
   border-radius: var(--r-8);
   background: var(--ink-04);
+  overflow: hidden;
 }
+.pdmc__preview .pv { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+/* кнопки в один ряд */
+.pdmc__actions { display: flex; align-items: center; gap: var(--gap-8); }
+.pdmc__actions .btn { padding: 8px 12px; white-space: nowrap; }
+.pdmc__link { color: var(--accent); }
+.pdmc__link:hover { text-decoration: underline; }
+.pdmc__price-row { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-8); padding: 0 4px; }
 .pdmc__price { font-size: 14px; line-height: 20px; font-weight: 500; color: var(--ink); }
 .pdmc__price--free { color: var(--ok); }
 

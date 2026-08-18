@@ -190,6 +190,7 @@
     const kindDef = DMC_KINDS.find((k) => k.id === d.kind) || {};
     const detail = dmcDetail(d);
 
+    previewInto($('#pdmc-preview'), 96, kindDef.icon);
     $('#pdmc-name').textContent = d.name;
     $('#pdmc-name').title = d.name;
 
@@ -213,36 +214,46 @@
       : n % 10 === 1 ? 'загрузка'
       : n % 10 >= 2 && n % 10 <= 4 ? 'загрузки'
       : 'загрузок';
-    $('#pdmc-meta').textContent = `${publisher['Компания']} · ${n} ${tail} · обновлён ${publisher['Обновлён']}`;
+    // пункты через вертикальный разделитель, как в референсе
+    const meta = $('#pdmc-meta');
+    meta.textContent = '';
+    [publisher['Компания'], `${n} ${tail}`, `обновлён ${publisher['Обновлён']}`].forEach((txt, i) => {
+      if (i) meta.appendChild(el('span', 'pdmc__meta-sep'));
+      const s = el('span');
+      s.textContent = txt;
+      meta.appendChild(s);
+    });
+
+    // кнопки и цена — над вкладками, видны всегда
+    const cta = $('#pdmc-cta');
+    cta.textContent = '';
+    const actions = el('div', 'pdmc__actions');
+    const trial = el('button', 'btn btn--dark');
+    trial.type = 'button';
+    trial.textContent = 'Получить пробную';
+    const request = el('button', 'btn');
+    request.type = 'button';
+    request.textContent = 'Запросить постпроцессор';
+    actions.append(trial, request);
+
+    const ask = el('a', 'pdmc__link');
+    ask.href = '#';
+    ask.textContent = 'Спросить о компоненте';
+
+    // ссылка и цена — одной строкой под кнопками
+    const priceRow = el('div', 'pdmc__price-row');
+    const priceVal = el('span', `pdmc__price${d.price ? '' : ' pdmc__price--free'}`);
+    priceVal.textContent = priceLabel(d.price);
+    priceRow.append(ask, priceVal);
+    cta.append(actions, priceRow);
 
     const body = $('#pdmc-body');
     body.textContent = '';
 
     if (state.dmcTab === 'about') {
-      const actions = el('div', 'pdmc__actions');
-      const trial = el('button', 'btn btn--dark');
-      trial.type = 'button';
-      trial.textContent = 'Получить пробную';
-      const request = el('button', 'btn');
-      request.type = 'button';
-      request.textContent = 'Запросить постпроцессор';
-      actions.append(trial, request);
-
-      const ask = el('a', 'pdmc__link');
-      ask.href = '#';
-      ask.textContent = 'Спросить о компоненте';
-
-      const priceRow = el('div', 'pdmc__price-row');
-      const priceKey = el('span', 'pdmc__key');
-      priceKey.textContent = 'Цена';
-      const priceVal = el('span', `pdmc__price${d.price ? '' : ' pdmc__price--free'}`);
-      priceVal.textContent = priceLabel(d.price);
-      priceRow.append(priceKey, priceVal);
-
       const about = el('p', 'pdmc__about');
       about.textContent = detail.about;
-
-      body.append(actions, ask, priceRow, block('Описание', about), block('Публикация', propList(detail.publisher)));
+      body.append(block('Описание', about), block('Публикация', propList(detail.publisher)));
     }
 
     if (state.dmcTab === 'specs') {
