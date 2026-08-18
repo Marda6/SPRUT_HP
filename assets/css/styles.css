@@ -178,23 +178,25 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 }
 
 /* Навигация разделов (3064:14742) */
+/* В макете ряд 52px с табами по 40px. Сжато до 44/36, но иерархия сохранена:
+   таб раздела 36px и 14px текста против 32px и 12px у переключателя внутри. */
 .section-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 52px;
-  padding: 6px;
+  height: 44px;
+  padding: 4px;
   border-radius: var(--r-12);
   background: var(--ink-08);
   flex: 0 0 auto;
 }
-.section-nav__group { display: flex; align-items: center; gap: var(--gap-8); height: 40px; }
-.section-nav__sep { width: 1px; align-self: stretch; background: var(--ink-16); }
+.section-nav__group { display: flex; align-items: center; gap: var(--gap-4); height: 36px; }
+.section-nav__sep { width: 1px; height: 20px; margin: 0 var(--gap-4); background: var(--ink-16); }
 .navtab {
   display: flex;
   align-items: center;
-  height: 40px;
-  padding: 8px 16px;
+  height: 36px;
+  padding: 8px 14px;
   border-radius: var(--r-6);
   font-size: 14px;
   line-height: 20px;
