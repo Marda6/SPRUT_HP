@@ -110,6 +110,7 @@ img[src$="icn-tab-close-active.svg"] { width: 8.707px; height: 8.707px; }
 img[src$="icn-kebab.svg"]         { width: 24px;     height: 24px; }
 img[src$="icn-star.svg"]          { width: 24px;     height: 24px; }
 img[src$="icn-globe.svg"]         { width: 16px;     height: 16px; }
+img[src$="icn-user.svg"]          { width: 24px;     height: 24px; }
 img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 
 /* Шеврон дропдауна: бокс 20px, глиф 13.5×7.25 (Dropdown Icon 30:3763) */
@@ -477,13 +478,21 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .card-icon { width: 24px; height: 24px; border-radius: var(--r-4); flex: 0 0 auto; }
 .card-icon img { width: 24px; height: 24px; }
 
-/* Иконка доступа — 4 слоя из Figma (Access project 2093:4310…4313) */
+/* Иконка типа проекта, бокс 24px.
+   Глиф «Access project» (2093:4310…4313) собирается из 4 слоёв с позициями
+   из Figma — у каждого свой класс, иначе правила слоёв ловят и одиночные глифы. */
 .access { position: relative; width: 24px; height: 24px; flex: 0 0 auto; overflow: hidden; }
 .access img { position: absolute; }
-.access img:nth-child(1) { left: 5.33px; top: 5px; width: 7px; height: 7px; }
-.access img:nth-child(2) { left: 13.33px; top: 8px; width: 5px; height: 5px; }
-.access img:nth-child(3) { left: 3.33px; top: 13px; width: 12px; height: 6px; }
-.access img:nth-child(4) { left: 11.33px; top: 14px; width: 10px; height: 5px; }
+.access__layer--1 { left: 5.33px; top: 5px; width: 7px; height: 7px; }
+.access__layer--2 { left: 13.33px; top: 8px; width: 5px; height: 5px; }
+.access__layer--3 { left: 3.33px; top: 13px; width: 12px; height: 6px; }
+.access__layer--4 { left: 11.33px; top: 14px; width: 10px; height: 5px; }
+/* Одиночные глифы по центру бокса. Глобус из Figma — контурный на канвасе 16px,
+   фигуры «человек» — заливка на 24px, поэтому глобус показываем на 20px,
+   чтобы вес читался одинаково. */
+.access__single { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.access img.access__single[src$="icn-globe.svg"] { width: 20px; height: 20px; }
+.access img.access__single[src$="icn-user.svg"] { width: 24px; height: 24px; }
 
 /* ── Правая панель (machine 3064:14827) ──────────────────── */
 .panel {
@@ -541,8 +550,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   overflow: hidden;
   overflow-wrap: anywhere;
 }
-.panel__visibility { display: flex; align-items: center; gap: var(--gap-8); color: var(--n-900); }
-.panel__visibility img { margin: 4px; } /* глиф 16px в боксе 24px */
+.panel__visibility { display: flex; align-items: center; gap: var(--gap-8); color: var(--n-900); flex: 0 0 auto; }
 
 .panel__actions { display: flex; align-items: center; gap: var(--gap-8); }
 .btn {

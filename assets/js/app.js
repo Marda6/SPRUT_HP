@@ -9,12 +9,23 @@
     return n;
   };
 
-  /* Иконка доступа: 4 экспортированных слоя из Figma, позиции — в CSS */
-  function accessIcon(variant = 'a') {
+  /* Иконка типа проекта напротив даты изменения.
+     layers — глиф «Access project» из Figma (4 слоя), icon — одиночный глиф. */
+  function statusIcon(status) {
+    const s = STATUS[status] || STATUS.public;
     const wrap = el('span', 'access');
-    for (let i = 1; i <= 4; i++) {
-      const img = el('img');
-      img.src = `assets/img/access-${variant}-${i}.svg`;
+    wrap.title = s.label;
+    wrap.setAttribute('aria-label', s.label);
+    if (s.layers) {
+      for (let i = 1; i <= 4; i++) {
+        const img = el('img', `access__layer access__layer--${i}`);
+        img.src = `assets/img/access-${s.layers}-${i}.svg`;
+        img.alt = '';
+        wrap.appendChild(img);
+      }
+    } else {
+      const img = el('img', 'access__single');
+      img.src = s.icon;
       img.alt = '';
       wrap.appendChild(img);
     }
@@ -32,7 +43,7 @@
     host.appendChild(img);
   }
 
-  function metaRow(changed, access) {
+  function metaRow(changed, status) {
     const row = el('div', 'card-meta');
     const text = el('div', 'card-meta__text');
     const label = el('div', 'card-meta__label');
@@ -40,7 +51,7 @@
     const value = el('div', 'card-meta__value');
     value.textContent = changed;
     text.append(label, value);
-    row.append(text, accessIcon(access));
+    row.append(text, statusIcon(status));
     return row;
   }
 
@@ -66,7 +77,7 @@
       const body = el('div', 'collection__body');
       const name = el('h3', 'collection__name');
       name.textContent = c.name;
-      body.append(name, metaRow(c.changed, c.access));
+      body.append(name, metaRow(c.changed, c.status));
 
       const foot = el('div', 'card-foot');
       const count = el('span', 'card-foot__text');
@@ -101,15 +112,15 @@
       const name = el('h3', 'project__name');
       name.textContent = p.name;
       name.title = p.name; // полное имя, если обрезано двумя строками
-      top.append(name, metaRow(p.changed, p.access));
+      top.append(name, metaRow(p.changed, p.status));
 
       const foot = el('div', 'card-foot');
-      const accessText = el('span', 'card-foot__text');
-      accessText.textContent = p.accessText;
+      const location = el('span', 'card-foot__text'); // где лежит проект
+      location.textContent = p.location;
       const actions = el('div', 'card-foot__actions');
       if (p.favorite) actions.appendChild(iconButton('assets/img/icn-star.svg', 'В избранное'));
       actions.appendChild(iconButton('assets/img/icn-kebab.svg', 'Действия'));
-      foot.append(accessText, actions);
+      foot.append(location, actions);
 
       col.append(top, el('div', 'card-divider'), foot);
       card.append(preview, col);
@@ -122,7 +133,12 @@
     previewInto($('#panel-preview'), 96);
     $('#panel-name').textContent = p.name;
     $('#panel-name').title = p.name;
-    $('#panel-visibility').textContent = p.visibility;
+    // тип проекта: та же иконка, что в карточке, + короткая подпись
+    const vis = $('#panel-visibility');
+    vis.textContent = '';
+    const visLabel = el('span');
+    visLabel.textContent = STATUS[p.status].short;
+    vis.append(statusIcon(p.status), visLabel);
 
     const props = $('#panel-props');
     props.textContent = '';
