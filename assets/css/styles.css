@@ -515,9 +515,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
    вертикальная, потому что строк свойств пять, в 146px они не укладываются. */
 .dmc {
   display: flex;
-  flex-direction: column;
-  gap: var(--gap-8);
-  padding-bottom: 8px;
+  align-items: stretch;
   border-radius: var(--r-6);
   border: 1px solid transparent;
   background: var(--surface);
@@ -534,10 +532,19 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 
 .dmc__preview {
   position: relative;
-  height: 132px;
+  width: 120px;
   flex: 0 0 auto;
   background: var(--ink-04);
   overflow: hidden;
+}
+/* колонка с текстом справа от превью */
+.dmc__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-8);
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 0;
 }
 .dmc__preview .pv {
   position: absolute;
@@ -547,7 +554,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 }
 /* тело тянется, поэтому разделитель и футер прижаты к низу и стоят на одной
    линии во всех карточках ряда, независимо от длины названия и оснащения */
-.dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); flex: 1 1 auto; padding: 0 8px 0 12px; }
+.dmc__body { display: flex; flex-direction: column; gap: var(--gap-8); flex: 1 1 auto; padding: 0 12px; }
 .dmc__head { display: flex; align-items: flex-start; gap: var(--gap-8); }
 /* Цена в футере, слева от избранного */
 .dmc__price {
@@ -558,6 +565,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   color: var(--ink);
   white-space: nowrap;
 }
+/* одна строка с троеточием: в горизонтальной карточке названия короткие,
+   а фиксированная высота держит все карточки одинаковыми */
 .dmc__name {
   margin: 0;
   flex: 1 1 auto;
@@ -566,12 +575,9 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   line-height: 20px;
   font-weight: 500;
   color: var(--ink);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  min-height: 40px; /* место под две строки — чтобы свойства начинались на одной линии */
+  white-space: nowrap;
   overflow: hidden;
-  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
 }
 .dmc__props { display: flex; flex-direction: column; }
 /* в карточке значение выравниваем влево, в отличие от панели свойств */
@@ -640,6 +646,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   padding-right: 8px;
 }
 .collection .card-foot { padding-right: 4px; }
+.dmc .card-foot { padding-right: 12px; gap: var(--gap-8); }
 .card-foot__text {
   flex: 1 1 auto;
   min-width: 0;

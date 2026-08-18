@@ -154,7 +154,10 @@
       if (d.price === 'support') price.title = 'Включён в техническую поддержку';
       foot.append(kind, el('span', 'card-foot__spacer'), price);
 
-      card.append(preview, body, el('div', 'card-divider'), foot);
+      // превью слева, весь текст — в колонке справа
+      const col = el('div', 'dmc__col');
+      col.append(body, el('div', 'card-divider'), foot);
+      card.append(preview, col);
       host.appendChild(card);
     });
     fitEquipment();
