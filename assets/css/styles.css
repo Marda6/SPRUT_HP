@@ -991,6 +991,10 @@ button.combo__opt:disabled { color: var(--ink-30, rgba(9, 30, 51, 0.3)); cursor:
   background: var(--surface);
   box-shadow: var(--card-shadow);
 }
+/* режим правки обновления: рамка карточки — синий пунктир. Штрих длиннее,
+   чем у border: dashed (там шаг не настраивается), поэтому рамка — SVG-фон
+   со stroke-dasharray */
+.lic-hero.is-editing { border: 1px dashed var(--accent); box-shadow: none; }
 .lic-hero__top { display: flex; align-items: center; gap: var(--gap-12); }
 .lic-hero__name { margin: 0; font-size: 20px; line-height: 24px; font-weight: 600; color: var(--ink); }
 .lic-hero__actions { margin-left: auto; display: flex; align-items: center; gap: var(--gap-8); }

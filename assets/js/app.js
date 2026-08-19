@@ -721,6 +721,7 @@
     host.textContent = '';
     const c = LIC_CURRENT;
     const edit = state.licEdit;
+    host.classList.toggle('is-editing', edit); // синий пунктир вместо рамки
     const modules = edit ? state.licDraft.modules : c.modules;
     const pkgName = edit ? state.licDraft.package : c.package;
 
