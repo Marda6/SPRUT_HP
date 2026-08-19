@@ -59,9 +59,9 @@
     </nav>
 
     <div class="window-controls">
-      <button class="iconbtn" type="button" aria-label="Свернуть"><img src="assets/img/icn-win-minimize.svg" alt=""></button>
-      <button class="iconbtn" type="button" aria-label="Настройки"><img src="assets/img/icn-settings.svg" alt=""></button>
       <button class="iconbtn" type="button" aria-label="Ещё"><img src="assets/img/icn-win-chevron.svg" alt=""></button>
+      <button class="iconbtn" type="button" aria-label="Настройки"><img src="assets/img/icn-settings.svg" alt=""></button>
+      <button class="iconbtn" type="button" aria-label="Свернуть"><img src="assets/img/icn-win-minimize.svg" alt=""></button>
       <button class="iconbtn" type="button" aria-label="Развернуть"><img src="assets/img/icn-win-restore.svg" alt=""></button>
       <button class="iconbtn" type="button" aria-label="Закрыть"><img src="assets/img/icn-win-close.svg" alt=""></button>
     </div>
@@ -145,6 +145,22 @@
         </div>
       </div>
 
+      <!-- Менеджер лицензий: тулбар. Контент из референса License manager,
+           оформление наше -->
+      <div class="toolbar is-hidden" id="toolbar-lic">
+        <div class="toolbar__title">
+          <h1 class="page-title">Менеджер лицензий</h1>
+          <!-- до авторизации скрыт (управляется в refreshLic) -->
+          <div class="seg is-hidden" id="lic-seg" role="tablist" aria-label="Раздел менеджера лицензий">
+            <button class="seg__btn is-active" type="button" role="tab" aria-selected="true" data-licview="sw">Лицензии ПО</button>
+            <button class="seg__btn" type="button" role="tab" aria-selected="false" data-licview="ext">Расширения</button>
+          </div>
+        </div>
+        <!-- аккаунт, обновление списка и меню действий — рендерятся в JS,
+             видны только после входа -->
+        <div class="licbar" id="lic-actions"></div>
+      </div>
+
       <!-- Чипы-фильтры проектов (3287:8826) -->
       <div class="chips" id="chips-projects" role="group" aria-label="Фильтры проектов">
         <button class="chip is-active" type="button" data-filter="all">Все</button>
@@ -207,6 +223,53 @@
       <!-- Расширения. Заголовок секции не нужен — он уже есть в тулбаре -->
       <section class="section is-hidden" id="realm-ext">
         <div class="grid grid--ext" id="ext-items"></div>
+      </section>
+
+      <!-- Менеджер лицензий -->
+      <section class="section is-hidden" id="realm-lic">
+        <!-- текущая лицензия; в режиме «Обновить» становится редактируемой -->
+        <div class="lic-hero" id="lic-hero"></div>
+
+        <div class="lic-list__head">
+          <h2 class="section__title">Лицензии ПО</h2>
+          <div class="lic-list__tools">
+            <label class="search">
+              <input type="search" id="lic-search" placeholder="Поиск" aria-label="Поиск лицензий">
+              <span class="search__icon"><img src="assets/img/icn-search.svg" alt=""></span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="lic-expired" checked>
+              <span class="switch__track"></span>
+              <span>Показывать истёкшие</span>
+            </label>
+          </div>
+        </div>
+        <div class="lic-sub" id="lic-sub"></div>
+        <div class="lictable" id="lic-table"></div>
+
+        <!-- вкладка «Расширения» менеджера — пока заглушка -->
+        <div class="empty is-hidden" id="lic-ext-empty">
+          <p>Лицензии расширений — раздел ещё не собран.</p>
+        </div>
+
+        <!-- первый запуск: пользователь ещё не авторизован.
+             Слева приглашение, справа абстрактная геометрия в тонах системы -->
+        <div class="lic-auth is-hidden" id="lic-auth">
+          <div class="lic-auth__col">
+            <h2 class="lic-auth__title">СПРУТКАМ</h2>
+            <p class="lic-auth__text">Ведущая отечественная CAD/CAM-система</p>
+            <div class="lic-auth__actions">
+              <button class="btn btn--dark" type="button" id="lic-signin">Войти</button>
+              <button class="btn" type="button">Запросить триал</button>
+            </div>
+          </div>
+          <!-- рендер детали с траекториями; файл кладёт Руслан
+               (assets/img/auth-part.png) -->
+          <div class="lic-auth__art" aria-hidden="true">
+            <img src="assets/img/auth-part.png" alt=""
+              onerror="this.closest('.lic-auth__art').classList.add('is-hidden')">
+          </div>
+        </div>
       </section>
 
     </main>

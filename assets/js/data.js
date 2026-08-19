@@ -208,6 +208,82 @@ function extDownloadsLabel(n) {
   return `${k} тыс.`;
 }
 
+/* ── Менеджер лицензий ───────────────────────────────────────
+   Контент из референса License manager (ENCY), названия продуктов
+   заменены на СПРУТКАМ, оформление наше. */
+const LIC_CURRENT = {
+  id: '#421480',
+  name: 'СПРУТКАМ 5x фрезерный',
+  package: '5x фрезерный расширенный', // выбран пробным обновлением
+  basePackage: '5x фрезерный', // к нему возвращает «Сбросить изменения»
+  licensee: 'TONINI FABIO ELETTROMECCANICA',
+  type: 'Коммерческая',
+  protection: 'Аккаунт',
+  remaining: '199 дн.',
+  maintenance: '320 дн. · 30.06.2027',
+  trial: 'Обновление · 23 дн.', // коротко; полный смысл — в тултипе
+  // added — модули, добавленные пробным обновлением: выделены акцентом,
+  // в режиме правки их можно убрать
+  modules: [
+    { name: 'Раскрой', added: true },
+    { name: 'Робот+', added: true },
+    { name: 'Электроэрозия', added: true },
+    { name: 'Измерения', added: true },
+    { name: 'Адаптивная обработка' },
+    { name: 'СПРУТКАМ NB 3 5D' },
+    { name: 'СПРУТКАМ NB 3D' },
+    { name: 'СПРУТКАМ NB 3 2D' },
+    { name: 'СПРУТКАМ NB 3 6D' },
+    { name: 'Дисковая черновая' },
+    { name: 'Операции СПРУТКАМ NB 3' },
+    { name: 'Многоканальность' },
+    { name: 'Роботизированная токарная' },
+    { name: 'Чтение SOLIDWORKS' },
+    { name: 'Токарная' },
+    { name: 'Обработка отверстий' },
+    { name: 'Симуляция станка' },
+    { name: 'Чтение STEP' },
+  ],
+};
+
+/* Аккаунт, под которым получены лицензии */
+const LIC_ACCOUNT = { name: 'Иван Винокур', mail: 'Ivanov@mail.com' };
+
+/* Меню действий менеджера лицензий (из референса) */
+const LIC_MENU = ['Загрузить из файла', 'Запросить лицензию…', 'Активировать по коду', 'Запросить триал'];
+
+/* Пакеты для выпадающего списка в режиме обновления (из референса),
+   упорядочены от старшего к младшему */
+const LIC_PACKAGES = ['5x фрезерный расширенный', '5x фрезерный', 'Ротационный',
+  '3x фрезерный расширенный', '3x фрезерный', '2.5x фрезерный',
+  'Резка 5D', 'Резка', 'Токарный', 'Электроэрозионный'];
+
+/* Модули, которые можно добавить пробным обновлением (из референса) */
+const LIC_ADD_MODULES = ['Непрерывная 5-осевая', 'Продольное точение',
+  'Раскрой расширенный', 'Калибровка робота', 'Проверка траекторий',
+  'Распознавание элементов'];
+
+/* Таблица лицензий. *State: warn — жёлтый (скоро истечёт), danger — красный */
+const LIC_ROWS = [
+  { id: '#421480', name: 'СПРУТКАМ 5x фрезерный', extra: 17, remaining: '199 дней', type: 'Коммерческая', protection: 'Аккаунт', maintenance: '320 дней', status: 'current', action: 'release' },
+  { id: '#421481', name: 'СПРУТКАМ 3x фрезерный расширенный', extra: 6, remaining: 'Бессрочно', type: 'Коммерческая', protection: 'Программная', maintenance: 'Истекла', maintenanceState: 'danger', status: 'valid', action: 'activate' },
+  { id: '#421495', name: 'СПРУТКАМ Токарный', extra: 3, remaining: '29 дней', remainingState: 'warn', type: 'Коммерческая', protection: 'Аккаунт', maintenance: '29 дней', maintenanceState: 'warn', status: 'valid', action: 'activate' },
+  { id: '#421502', name: 'СПРУТКАМ Резка 5D', extra: 2, remaining: '159 дней', type: 'Учебно-коммерческая', protection: 'Программная', maintenance: '113 дней', status: 'valid', action: 'activate' },
+  { id: '#419330', name: 'СПРУТКАМ Ротационный', extra: 3, remaining: '289 дней', type: 'Учебная', protection: 'Аккаунт', maintenance: '231 день', status: 'valid', action: 'activate' },
+  { id: '#421520', name: 'СПРУТКАМ 5x фрезерный расширенный', extra: 3, remaining: '412 дней', type: 'Коммерческая', protection: 'Ключ', maintenance: '22 дня', maintenanceState: 'warn', status: 'valid', action: 'activate' },
+  { id: '#421533', name: 'СПРУТКАМ Электроэрозионный', extra: 2, remaining: '96 дней', type: 'Коммерческая', protection: 'Аккаунт', maintenance: '180 дней', status: 'signin', action: 'signin' },
+  { id: '#419355', name: 'СПРУТКАМ 2.5x фрезерный', extra: 2, remaining: '5 дней', remainingState: 'warn', type: 'Учебная', protection: 'Программная', maintenance: 'Истекла', maintenanceState: 'danger', status: 'valid', action: 'activate' },
+  { id: '#402118', name: 'СПРУТКАМ Резка', extra: 2, remaining: 'Истекла', remainingState: 'danger', type: 'Пробная', protection: 'Программная', maintenance: 'Истекла', maintenanceState: 'danger', status: 'invalid', expired: true },
+];
+
+const LIC_STATUS = {
+  current: 'Текущая',
+  valid: 'Действительна',
+  signin: 'Нужен вход',
+  invalid: 'Недействительна',
+};
+const LIC_ACTION = { release: 'Освободить', activate: 'Активировать', signin: 'Войти' };
+
 const COLLECTIONS = [
   { name: '3D фрезерование', count: '12 проектов', changed: '18.06.2024 09:12:44', status: 'public' },
   { name: 'Обучение Роботы', count: '7 проектов', changed: '02.05.2024 14:03:19', status: 'public' },

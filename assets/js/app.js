@@ -38,7 +38,15 @@
     const label = el('div', 'card-meta__label');
     label.textContent = 'Изменения';
     const value = el('div', 'card-meta__value');
-    value.textContent = changed;
+    // в тесной карточке время прячется (@container в styles.css),
+    // полная дата со временем — в тултипе
+    const [date, time] = changed.split(' ');
+    value.title = changed;
+    const dateSpan = el('span');
+    dateSpan.textContent = date;
+    const timeSpan = el('span', 'card-meta__time');
+    timeSpan.textContent = ` ${time}`;
+    value.append(dateSpan, timeSpan);
     text.append(label, value);
     row.append(text, statusIcon(status));
     return row;
@@ -164,6 +172,33 @@
   }
 
   /* ── Расширения ────────────────────────────────────────── */
+  /* Кнопка действия: «Установить» → анимация установки → тёмная «Открыть» */
+  function extActionButton(x) {
+    const installing = state.extInstalling.has(x.id);
+    const action = el('button', x.installed ? 'btn ext__open'
+      : installing ? 'btn ext__install is-installing' : 'btn ext__install');
+    action.type = 'button';
+    action.textContent = x.installed ? 'Открыть' : installing ? 'Установка…' : 'Установить';
+    if (x.installed) action.title = 'Расширение установлено';
+    if (installing) action.disabled = true;
+    else if (!x.installed) action.dataset.install = x.id;
+    return action;
+  }
+
+  /* Установка — имитация: полоса прогресса бежит по кнопке, по завершении
+     расширение становится установленным */
+  function startInstall(id) {
+    const item = EXT_ITEMS.find((x) => x.id === id);
+    if (!item || item.installed || state.extInstalling.has(id)) return;
+    state.extInstalling.add(id);
+    refreshExt();
+    setTimeout(() => {
+      state.extInstalling.delete(id);
+      item.installed = true;
+      refreshExt();
+    }, 1800); // длительность совпадает с анимацией .is-installing::before
+  }
+
   /* Карточка расширения: контент из референса, стиль карточки компонента */
   function renderExtItems(list) {
     const host = $('#ext-items');
@@ -211,12 +246,7 @@
       downloads.title = `${String(x.downloads).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} загрузок`;
       // обе кнопки светлые: тёмная заливка в системе — признак выбранного
       // элемента, а не действия
-      // «Установить» — контурная акцентная, «Открыть» у установленного —
-      // залитая акцентом: заметнее и не путается с установкой
-      const action = el('button', x.installed ? 'btn ext__open' : 'btn ext__install');
-      action.type = 'button';
-      action.textContent = x.installed ? 'Открыть' : 'Установить';
-      if (x.installed) action.title = 'Расширение установлено';
+      const action = extActionButton(x);
       foot.append(kind, el('span', 'ext__foot-sep'), downloads,
         el('span', 'card-foot__spacer'), action);
 
@@ -401,12 +431,10 @@
     badges.appendChild(kind);
     if (x.installed) {
       const done = el('span', 'ext__installed');
-      const check = el('img');
-      check.src = 'assets/img/icn-access-granted.svg';
-      check.alt = '';
+      // галка маской — в цвет надписи, иначе два разных зелёных
       const doneLabel = el('span');
       doneLabel.textContent = 'Установлено';
-      done.append(check, doneLabel);
+      done.append(el('span', 'ext__installed-glyph'), doneLabel);
       badges.appendChild(done);
     }
 
@@ -423,9 +451,19 @@
     const cta = $('#pext-cta');
     cta.textContent = '';
     const actions = el('div', 'pdmc__actions');
-    const action = el('button', x.installed ? 'btn ext__open' : 'btn ext__install');
-    action.type = 'button';
-    action.textContent = x.installed ? 'Открыть' : 'Установить';
+    // установленное можно удалить — вдруг поставлено по ошибке
+    if (x.installed) {
+      const remove = el('button', 'btn');
+      remove.type = 'button';
+      remove.textContent = 'Удалить';
+      remove.addEventListener('click', () => {
+        x.installed = false;
+        refreshExt();
+      });
+      actions.appendChild(remove);
+    }
+    const action = extActionButton(x);
+    if (action.dataset.install) action.addEventListener('click', () => startInstall(x.id));
     actions.appendChild(action);
     cta.appendChild(actions);
 
@@ -442,10 +480,20 @@
       ['Загрузок', String(x.downloads).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')],
     ])));
 
+    // теги кликабельны: щелчок включает/выключает фильтр по тегу
     const tags = el('div', 'tag-list');
     (x.tags || []).forEach((t) => {
-      const tag = el('span', 'tag tag--neutral');
+      const tag = el('button', 'tag tag--neutral tag--click');
+      tag.type = 'button';
       tag.textContent = t;
+      tag.title = `Фильтровать по тегу «${t}»`;
+      if (state.extFilters.tags.has(t)) tag.classList.add('is-on');
+      tag.addEventListener('click', () => {
+        const set = state.extFilters.tags;
+        set.has(t) ? set.delete(t) : set.add(t);
+        renderExtFilters(); // комбобокс «Теги» отражает выбор
+        refreshExt();
+      });
       tags.appendChild(tag);
     });
     if (x.tags?.length) body.appendChild(block('Теги', tags));
@@ -618,6 +666,354 @@
     });
   }
 
+  /* ── Менеджер лицензий ─────────────────────────────────── */
+  function licMetaItem(label, valueNode) {
+    const item = el('div');
+    const l = el('div', 'lic-meta__label');
+    l.textContent = label;
+    const v = el('div', 'lic-meta__value');
+    if (typeof valueNode === 'string') v.textContent = valueNode;
+    else v.appendChild(valueNode);
+    item.append(l, v);
+    return item;
+  }
+
+  /* Простое выпадающее меню: обёртка .combo, чтобы клик мимо закрывал его
+     тем же глобальным обработчиком, что и комбобоксы фильтров */
+  function licMenu(trigger, items, onPick) {
+    const box = el('span', 'combo');
+    const pop = el('div', 'combo__pop combo__pop--menu is-hidden');
+    // место под галку резервируем только если она в меню вообще есть
+    const hasMarks = items.some((it) => it.checked);
+    items.forEach((it) => {
+      const row = el('button', 'combo__opt');
+      row.type = 'button';
+      const label = el('span', 'combo__opt-label');
+      label.textContent = it.label;
+      if (hasMarks) {
+        const mark = el('span', 'combo__mark');
+        if (it.checked) mark.textContent = '✓';
+        row.appendChild(mark);
+      }
+      row.appendChild(label);
+      if (it.disabled) {
+        row.disabled = true;
+        if (it.hint) row.title = it.hint;
+      } else {
+        row.addEventListener('click', () => {
+          pop.classList.add('is-hidden');
+          onPick(it.value);
+        });
+      }
+      pop.appendChild(row);
+    });
+    trigger.addEventListener('click', () => {
+      const wasHidden = pop.classList.contains('is-hidden');
+      document.querySelectorAll('.combo__pop').forEach((p) => p.classList.add('is-hidden'));
+      if (wasHidden) pop.classList.remove('is-hidden');
+    });
+    box.append(trigger, pop);
+    return box;
+  }
+
+  function renderLicHero() {
+    const host = $('#lic-hero');
+    host.textContent = '';
+    const c = LIC_CURRENT;
+    const edit = state.licEdit;
+    const modules = edit ? state.licDraft.modules : c.modules;
+    const pkgName = edit ? state.licDraft.package : c.package;
+
+    const top = el('div', 'lic-hero__top');
+    const name = el('h2', 'lic-hero__name');
+    name.textContent = c.name;
+    const ok = el('span', 'lic-tag lic-tag--ok');
+    ok.textContent = 'Текущая';
+    const trial = el('span', 'lic-tag lic-tag--trial');
+    trial.textContent = c.trial;
+    trial.title = 'Пробное обновление, осталось 23 дня';
+    const actions = el('div', 'lic-hero__actions');
+    if (edit) {
+      const cancel = el('button', 'btn');
+      cancel.type = 'button';
+      cancel.textContent = 'Отмена';
+      cancel.addEventListener('click', () => {
+        state.licEdit = false;
+        state.licDraft = null; // правки отбрасываются
+        renderLicHero();
+      });
+      const save = el('button', 'btn btn--dark');
+      save.type = 'button';
+      save.textContent = 'Сохранить';
+      save.addEventListener('click', () => {
+        c.modules = state.licDraft.modules; // правки применяются
+        c.package = state.licDraft.package;
+        state.licEdit = false;
+        state.licDraft = null;
+        renderLicHero();
+      });
+      actions.append(cancel, save);
+    } else {
+      const reset = el('button', 'btn');
+      reset.type = 'button';
+      reset.textContent = 'Сбросить изменения';
+      // откат пробного обновления: добавленные модули и пакет — к базовым
+      reset.addEventListener('click', () => {
+        c.modules = c.modules.filter((m) => !m.added);
+        c.package = c.basePackage;
+        renderLicHero();
+      });
+      const upgrade = el('button', 'btn');
+      upgrade.type = 'button';
+      upgrade.textContent = 'Обновить';
+      upgrade.addEventListener('click', () => {
+        state.licEdit = true;
+        // черновик: правки применяются «Сохранить», отбрасываются «Отменой»
+        state.licDraft = { package: c.package, modules: c.modules.map((m) => ({ ...m })) };
+        renderLicHero();
+      });
+      const request = el('button', 'btn btn--dark');
+      request.type = 'button';
+      request.textContent = 'Запросить обновление';
+      actions.append(reset, upgrade, request);
+    }
+    top.append(name, ok, trial, actions);
+
+    // конфигурация в режиме правки — выпадающий список; поднятая пробным
+    // обновлением помечается акцентом, как добавленные модули
+    let pkg = pkgName;
+    if (!edit && pkgName !== c.basePackage) {
+      pkg = el('span', 'lic-upgraded');
+      pkg.textContent = pkgName;
+      pkg.title = `Пробное обновление: базовая конфигурация — ${c.basePackage}`;
+    }
+    if (edit) {
+      const trigger = el('button', 'lic-package');
+      trigger.type = 'button';
+      if (pkgName !== c.basePackage) trigger.classList.add('lic-upgraded');
+      const t = el('span');
+      t.textContent = pkgName;
+      const chev = el('span', 'chev');
+      const img = el('img');
+      img.src = 'assets/img/icn-chevron.svg';
+      img.alt = '';
+      chev.appendChild(img);
+      trigger.append(t, chev);
+      // обновиться можно только на старший пакет: список упорядочен от
+      // старшего к младшему, всё ниже базового — недоступно
+      const baseIdx = LIC_PACKAGES.indexOf(c.basePackage);
+      pkg = licMenu(trigger,
+        LIC_PACKAGES.map((p, i) => ({
+          value: p,
+          label: p,
+          checked: p === pkgName,
+          disabled: i > baseIdx,
+          hint: i > baseIdx ? 'Доступны только старшие пакеты' : '',
+        })),
+        (p) => {
+          state.licDraft.package = p;
+          renderLicHero();
+        });
+    }
+
+    const meta = el('div', 'lic-meta');
+    [['ID', c.id], ['Конфигурация', pkg], ['Лицензиат', c.licensee], ['Тип', c.type],
+      ['Защита', c.protection], ['Осталось', c.remaining], ['Поддержка', c.maintenance]]
+      .forEach(([k, v]) => meta.appendChild(licMetaItem(k, v)));
+
+    const mods = el('div', 'lic-modules');
+    const label = el('span', 'lic-modules__label');
+    label.textContent = `Включено ${modules.length}`;
+    const list = el('div', 'lic-modules__list');
+    if (edit) {
+      const add = el('button', 'tag tag--add');
+      add.type = 'button';
+      add.textContent = '+ Добавить модуль';
+      // выпадающий список доступных модулей; уже добавленные не предлагаем
+      const taken = new Set(modules.map((m) => m.name));
+      const available = LIC_ADD_MODULES.filter((m) => !taken.has(m));
+      list.appendChild(licMenu(add,
+        available.map((m) => ({ value: m, label: m })),
+        (m) => {
+          state.licDraft.modules.unshift({ name: m, added: true });
+          renderLicHero();
+        }));
+    }
+    modules.forEach((m, i) => {
+      const tag = el('span', m.added ? 'tag tag--neutral tag--added' : 'tag tag--neutral');
+      const t = el('span');
+      t.textContent = m.name;
+      tag.appendChild(t);
+      if (edit && m.added) { // убрать можно только добавленное обновлением
+        const x = el('button', 'tag__x');
+        x.type = 'button';
+        x.textContent = '×';
+        x.setAttribute('aria-label', `Убрать ${m.name}`);
+        x.addEventListener('click', () => {
+          state.licDraft.modules.splice(i, 1);
+          renderLicHero();
+        });
+        tag.appendChild(x);
+      }
+      list.appendChild(tag);
+    });
+    mods.append(label, list);
+
+    host.append(top, el('div', 'card-divider'), meta, el('div', 'card-divider'), mods);
+
+    // свёрнуто — одна строка, лишнее в «+N ещё»; развёрнуто — все модули.
+    // В режиме правки всегда все: нужен доступ к крестикам
+    if (!edit) fitLicModules(list);
+  }
+
+  /* Модули в одну строку: прячем с конца, пока список не уместится.
+     «+N ещё» раскрывает всё, «Свернуть» возвращает одну строку. */
+  function fitLicModules(list) {
+    if (state.licModsExpanded) {
+      const collapse = el('button', 'tag tag--toggle');
+      collapse.type = 'button';
+      collapse.textContent = 'Свернуть';
+      collapse.addEventListener('click', () => {
+        state.licModsExpanded = false;
+        renderLicHero();
+      });
+      list.appendChild(collapse);
+      return;
+    }
+    const oneRow = () => list.clientHeight <= 30; // плашка 24px + запас
+    if (oneRow()) return; // всё влезло — «+N» не нужен
+    const more = el('button', 'tag tag--toggle');
+    more.type = 'button';
+    more.addEventListener('click', () => {
+      state.licModsExpanded = true;
+      renderLicHero();
+    });
+    list.appendChild(more);
+    const tags = [...list.querySelectorAll('.tag')].filter((t) => t !== more);
+    let hidden = 0;
+    for (let i = tags.length - 1; i >= 1; i--) {
+      if (oneRow()) break;
+      tags[i].classList.add('is-hidden');
+      hidden += 1;
+      more.textContent = `+${hidden} ещё`;
+    }
+    more.title = tags.slice(tags.length - hidden).map((t) => t.textContent).join(', ');
+  }
+
+  function renderLicTable() {
+    const q = state.licQuery.trim().toLowerCase();
+    const rows = LIC_ROWS.filter((r) => {
+      if (!state.licShowExpired && r.expired) return false;
+      return !q || r.name.toLowerCase().includes(q) || r.id.includes(q);
+    });
+    $('#lic-sub').textContent = `${LIC_CURRENT.licensee} · ${rows.length} лицензий`;
+
+    const host = $('#lic-table');
+    host.textContent = '';
+    const head = el('div', 'licrow licrow--head');
+    // те же липкие классы, что у строк, — шапка скроллится синхронно
+    [['ID', 'licrow__id'], ['Лицензия', 'licrow__name'], ['Осталось'], ['Тип'],
+      ['Защита'], ['Поддержка'], ['Статус'], ['', 'licrow__action'], ['', 'licrow__kebab']]
+      .forEach(([t, cls]) => {
+        const cell = el('div', cls);
+        cell.textContent = t;
+        head.appendChild(cell);
+      });
+    host.appendChild(head);
+
+    rows.forEach((r) => {
+      const row = el('div', `licrow${r.status === 'current' ? ' licrow--current' : ''}${r.status === 'invalid' ? ' licrow--invalid' : ''}`);
+      const id = el('div', 'licrow__id');
+      id.textContent = r.id;
+
+      const name = el('div', 'licrow__name');
+      const n = el('span');
+      n.textContent = r.name;
+      n.title = r.name;
+      const extra = el('span', 'licrow__extra');
+      extra.textContent = `+${r.extra}`;
+      extra.title = `Ещё ${r.extra} модулей в лицензии`;
+      name.append(n, extra);
+
+      const cell = (text, tone) => {
+        const c = el('div', tone ? `lic-${tone}` : '');
+        c.textContent = text;
+        return c;
+      };
+      const status = cell(LIC_STATUS[r.status],
+        r.status === 'current' ? 'ok' : r.status === 'invalid' ? 'danger' : '');
+
+      const actionBox = el('div', 'licrow__action');
+      if (r.action) {
+        const btn = el('button', 'btn');
+        btn.type = 'button';
+        btn.textContent = LIC_ACTION[r.action];
+        actionBox.appendChild(btn);
+      }
+      const kebabBox = el('div', 'licrow__kebab');
+      if (r.status !== 'current') kebabBox.appendChild(iconButton('assets/img/icn-kebab.svg', 'Действия'));
+
+      row.append(id, name,
+        cell(r.remaining, r.remainingState),
+        cell(r.type),
+        cell(r.protection),
+        cell(r.maintenance, r.maintenanceState),
+        status, actionBox, kebabBox);
+      host.appendChild(row);
+    });
+  }
+
+  /* Аккаунт, обновление списка и меню действий в тулбаре — после входа */
+  function renderLicBar() {
+    const host = $('#lic-actions');
+    host.textContent = '';
+    if (!state.licAuthed) return;
+
+    const account = el('div', 'licbar__account');
+    const name = el('span', 'licbar__name');
+    name.textContent = LIC_ACCOUNT.name;
+    const mail = el('span', 'licbar__mail');
+    mail.textContent = LIC_ACCOUNT.mail;
+    account.append(name, mail);
+
+    const signout = el('button', 'btn');
+    signout.type = 'button';
+    signout.textContent = 'Выйти';
+    signout.addEventListener('click', () => {
+      state.licAuthed = false;
+      refreshLic();
+    });
+
+    const refreshBtn = iconButton('assets/img/icn-refresh.svg', 'Обновить список лицензий');
+    refreshBtn.className = 'iconbtn'; // 32px, не 24px карточной иконки
+    refreshBtn.title = 'Обновить список лицензий';
+
+    const kebab = iconButton('assets/img/icn-kebab.svg', 'Действия с лицензиями');
+    kebab.className = 'iconbtn';
+    const menu = licMenu(kebab, LIC_MENU.map((m) => ({ value: m, label: m })), () => {});
+    menu.querySelector('.combo__pop').classList.add('combo__pop--right');
+
+    host.append(account, signout, refreshBtn, menu);
+  }
+
+  function refreshLic() {
+    const authed = state.licAuthed;
+    const sw = authed && state.licView === 'sw';
+    ['#lic-hero', '.lic-list__head', '#lic-sub', '#lic-table'].forEach((sel) => {
+      $(sel).classList.toggle('is-hidden', !sw);
+    });
+    $('#lic-ext-empty').classList.toggle('is-hidden', !authed || state.licView === 'sw');
+    // первый запуск: без авторизации показываем только приглашение войти,
+    // переключатель разделов тоже прячем
+    $('#lic-auth').classList.toggle('is-hidden', authed);
+    $('#lic-seg').classList.toggle('is-hidden', !authed);
+    renderLicBar();
+    if (sw) {
+      renderLicHero();
+      renderLicTable();
+    }
+  }
+
   /* ── Подборки ──────────────────────────────────────────── */
   function renderCollections() {
     const host = $('#collections');
@@ -767,7 +1163,9 @@
 
   /* ── Состояние и взаимодействия ────────────────────────── */
   const state = {
-    section: 'library', // раздел навигации: library | extensions
+    // первый запуск: пользователь не авторизован, открыт менеджер лицензий
+    section: 'licenses',
+    licAuthed: false,
     realm: 'projects',
     filter: 'all',
     query: '',
@@ -782,6 +1180,13 @@
     // фильтры-комбобоксы; пустое множество = «не фильтруем».
     // Категории общие с чипами: чип выбирает одну, комбобокс — несколько
     extFilters: { kinds: new Set(), authors: new Set(), tags: new Set(), price: 'any' },
+    extInstalling: new Set(), // id расширений с идущей «установкой»
+    licView: 'sw', // Лицензии ПО | Расширения
+    licEdit: false, // режим правки текущей лицензии («Обновить»)
+    licDraft: null, // черновик модулей в режиме правки
+    licShowExpired: true,
+    licQuery: '',
+    licModsExpanded: false, // модули: одна строка или все
   };
 
   function visibleProjects() {
@@ -825,18 +1230,27 @@
   function updateChrome() {
     const lib = state.section === 'library';
     const isProjects = state.realm === 'projects';
+    // активный таб навигации следует за состоянием (важно при старте не с библиотеки)
+    document.querySelectorAll('.navtab').forEach((b) => {
+      b.classList.toggle('is-active', b.dataset.section === state.section);
+    });
     $('#toolbar-library').classList.toggle('is-hidden', !lib);
     $('#chips-projects').classList.toggle('is-hidden', !lib || !isProjects);
     $('#chips-dmc').classList.toggle('is-hidden', !lib || isProjects);
-    document.querySelectorAll('.content > .section:not(#realm-dmc):not(#realm-ext)').forEach((s) => {
+    document.querySelectorAll('.content > .section:not(#realm-dmc):not(#realm-ext):not(#realm-lic)').forEach((s) => {
       s.classList.toggle('is-hidden', !lib || !isProjects);
     });
     $('#realm-dmc').classList.toggle('is-hidden', !lib || isProjects);
     // загрузка компонентов идёт не отсюда — кнопка только у проектов
     $('.btn-primary').classList.toggle('is-hidden', !lib || !isProjects);
-    $('#toolbar-ext').classList.toggle('is-hidden', lib);
-    $('#chips-ext').classList.toggle('is-hidden', lib);
-    $('#realm-ext').classList.toggle('is-hidden', lib);
+    const ext = state.section === 'extensions';
+    const lic = state.section === 'licenses';
+    $('#toolbar-ext').classList.toggle('is-hidden', !ext);
+    $('#chips-ext').classList.toggle('is-hidden', !ext);
+    $('#realm-ext').classList.toggle('is-hidden', !ext);
+    $('#toolbar-lic').classList.toggle('is-hidden', !lic);
+    $('#realm-lic').classList.toggle('is-hidden', !lic);
+    if (lic) refreshLic();
     // все панели перерисовываем: каждая сама скроется в чужом разделе
     refresh();
     refreshDmc();
@@ -916,7 +1330,7 @@
     document.querySelectorAll('.navtab').forEach((btn) => {
       btn.addEventListener('click', () => {
         const section = btn.dataset.section;
-        if (section !== 'library' && section !== 'extensions') return;
+        if (!['library', 'extensions', 'licenses'].includes(section)) return;
         state.section = section;
         document.querySelectorAll('.navtab').forEach((b) => b.classList.toggle('is-active', b === btn));
         updateChrome();
@@ -934,6 +1348,35 @@
         });
         updateChrome();
       });
+    });
+
+    // менеджер лицензий: Лицензии ПО / Расширения
+    document.querySelectorAll('#toolbar-lic .seg__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.licView = btn.dataset.licview;
+        document.querySelectorAll('#toolbar-lic .seg__btn').forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-selected', String(on));
+        });
+        refreshLic();
+      });
+    });
+
+    // вход из заглушки первого запуска
+    $('#lic-signin').addEventListener('click', () => {
+      state.licAuthed = true;
+      refreshLic();
+    });
+
+    // поиск и «Показывать истёкшие»
+    $('#lic-search').addEventListener('input', (e) => {
+      state.licQuery = e.target.value;
+      renderLicTable();
+    });
+    $('#lic-expired').addEventListener('change', (e) => {
+      state.licShowExpired = e.target.checked;
+      renderLicTable();
     });
 
     // клик мимо комбобокса закрывает его список
@@ -955,6 +1398,11 @@
         const item = EXT_ITEMS.find((x) => x.id === star.dataset.fav);
         item.favorite = !item.favorite;
         refreshExt();
+        return;
+      }
+      const install = e.target.closest('[data-install]');
+      if (install) {
+        startInstall(install.dataset.install);
         return;
       }
       const card = e.target.closest('.ext');
@@ -1001,9 +1449,10 @@
       refreshDmc();
     });
 
-    // при изменении ширины пересчитываем, сколько плашек оснащения влезает
+    // при изменении ширины пересчитываем, что влезает в одну строку
     window.addEventListener('resize', () => {
       if (state.realm === 'dmc') fitEquipment();
+      if (state.section === 'licenses' && !state.licEdit) renderLicHero();
     });
 
     // табы проектов в титульной строке
@@ -1020,5 +1469,5 @@
   renderKindChips();
   renderExtFilters();
   bind();
-  refresh();
+  updateChrome(); // применяет стартовый раздел (менеджер лицензий без входа)
 })();

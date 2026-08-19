@@ -42,7 +42,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   display: flex;
   flex-direction: column;
   height: 100vh;
-  min-width: 1280px;
+  /* было 1280 — давало горизонтальный скролл всему интерфейсу.
+     Сетки адаптивные, поэтому ограничиваем только разумным минимумом */
+  min-width: 960px;
 }
 .app__body {
   display: flex;
@@ -522,7 +524,9 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .project.is-selected .project__preview { background: var(--ink-08); }
 .project__preview {
   position: relative;
-  width: 160px;
+  /* уже высоты карточки — тексту достаётся больше места
+     (в макете было 160px при высоте 146) */
+  width: 120px;
   flex: 0 0 auto;
   background: var(--ink-04);
   overflow: hidden;
@@ -693,13 +697,20 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .kind-tag--popup { background: var(--kind-interpreter-bg); color: var(--kind-interpreter); }
 .kind-tag--global { background: var(--kind-kit-bg); color: var(--kind-kit); }
 .card-foot__spacer { flex: 1 1 auto; }
-/* «В избранное»: у избранных видна всегда, у остальных появляется по ховеру */
-.card-icon--fav { opacity: 0; transition: opacity 0.12s ease; }
+/* «В избранное»: у избранных видна всегда, у остальных появляется по ховеру.
+   Скрытая звезда схлопывается и по ширине — иначе резервировала 24px
+   и текст рядом резался даже там, где места хватало */
+.card-icon--fav {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 0.12s ease, width 0.12s ease;
+}
 .card-icon--fav.is-on,
 .dmc:hover .card-icon--fav,
 .ext:hover .card-icon--fav,
 .project:hover .card-icon--fav,
-.card-icon--fav:focus-visible { opacity: 1; }
+.card-icon--fav:focus-visible { opacity: 1; width: 24px; }
 
 /* ── Карточка расширения ─────────────────────────────────── */
 /* Горизонтальная, по образцу карточки компонента: превью слева, текст в
@@ -847,6 +858,15 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   color: var(--n-900);
 }
 .combo__opt:hover { background: var(--ink-04); }
+/* меню без поиска (пакет, модули) — ширина по самому длинному пункту,
+   текст пунктов не усекается */
+.combo__pop--menu { width: max-content; min-width: 100%; }
+.combo__pop--menu .combo__opt-label { overflow: visible; text-overflow: clip; }
+/* пункты-кнопки (меню пакета/модулей): текст слева, как у пунктов-чекбоксов */
+button.combo__opt { text-align: left; width: 100%; }
+button.combo__opt:disabled { color: var(--ink-30, rgba(9, 30, 51, 0.3)); cursor: default; background: none; }
+/* место под галку текущего значения зарезервировано всегда */
+.combo__mark { width: 14px; flex: 0 0 auto; }
 .combo__opt input { accent-color: var(--accent); margin: 0; flex: 0 0 auto; }
 .combo__opt-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .combo__opt-hint { color: var(--ink-60); font-size: 12px; }
@@ -859,6 +879,26 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 /* «Установить» — контурная акцентная */
 .btn.ext__install { border-color: var(--accent); color: var(--accent); }
 .btn.ext__install:hover { background: rgba(54, 113, 216, 0.06); }
+/* Идёт установка: по кнопке слева направо бежит синяя полоса прогресса.
+   Длительность синхронизирована с таймером в startInstall() */
+.btn.ext__install.is-installing {
+  position: relative;
+  overflow: hidden;
+  pointer-events: none;
+}
+.btn.ext__install.is-installing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(54, 113, 216, 0.16);
+  transform-origin: left;
+  animation: ext-install 1.8s ease-out forwards;
+}
+@keyframes ext-install {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 /* «Открыть» у установленного — тёмная заливка, как у активного чипа */
 .btn.ext__open { background: var(--ink-80); border-color: transparent; color: #fff; }
 .btn.ext__open:hover { background: var(--ink); }
@@ -873,13 +913,197 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   color: var(--kind-scheme);
   white-space: nowrap;
 }
-.ext__installed img { width: 16px; height: 16px; }
+/* кликабельный тег: щёлк — фильтр по тегу; включённый — акцентная рамка */
+.tag.tag--click { cursor: pointer; }
+.tag.tag--click:hover { background: var(--ink-16); }
+.tag.tag--click.is-on {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* галка маской — в цвет надписи (в файле она #00CB9A, другой зелёный) */
+.ext__installed-glyph {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask: url(../img/icn-access-granted.svg) center / contain no-repeat;
+  mask: url(../img/icn-access-granted.svg) center / contain no-repeat;
+}
+
+/* ── Менеджер лицензий ───────────────────────────────────── */
+/* аккаунт и действия в тулбаре */
+.licbar { margin-left: auto; display: flex; align-items: center; gap: var(--gap-8); }
+.licbar__account { display: flex; align-items: baseline; gap: var(--gap-8); margin-right: var(--gap-8); }
+.licbar__name { color: var(--ink); }
+.licbar__mail { font-size: 12px; color: var(--ink-60); }
+.licbar .iconbtn { border: 1px solid var(--ink-08); background: var(--ink-04); }
+/* меню действий выпадает вправо — прижимаем к правому краю кнопки */
+.combo__pop--right { left: auto; right: 0; }
+
+/* Заглушка первого запуска: название и вход слева, рендер детали справа,
+   на фоне — лёгкий узор из изометрических кубов (как в референсе) */
+.lic-auth {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding: 48px 0 48px 64px;
+  border-radius: var(--r-8);
+  background-color: #f2f4f6;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='368' viewBox='0 0 320 368'%3E%3Cg%3E%3Cpath d='M160 40 280 100v120l-120 60-120-60V100Z' fill='%23091E33' fill-opacity='0.025'/%3E%3Cpath d='M160 40 280 100l-120 60L40 100Z' fill='%23ffffff' fill-opacity='0.6'/%3E%3Cpath d='M160 160v120L40 220V100Z' fill='%23091E33' fill-opacity='0.03'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 320px 368px;
+  overflow: hidden;
+}
+.lic-auth__col { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 1 420px; }
+/* название крупно, гарнитура логотипа */
+.lic-auth__title {
+  margin: 0;
+  font-family: 'Montserrat', var(--font, Inter), sans-serif;
+  font-size: 44px;
+  line-height: 52px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--ink);
+}
+.lic-auth__text { margin: 0 0 16px; max-width: 400px; color: var(--ink-80); }
+.lic-auth__actions { display: flex; gap: var(--gap-8); }
+.lic-auth__actions .btn { flex: 0 0 auto; height: 40px; padding: 0 24px; }
+/* рендер без рамки, прижат к правому и нижнему краю панели: низ картинки
+   уходит за кромку (overflow: hidden), будто деталь скрывается за краем */
+.lic-auth__art {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 560px;
+  margin: 0 0 -72px auto;
+  align-self: flex-end;
+}
+.lic-auth__art img { display: block; width: 100%; height: auto; }
+
+/* Карточка текущей лицензии */
+.lic-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-12);
+  padding: 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--r-8);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+.lic-hero__top { display: flex; align-items: center; gap: var(--gap-12); }
+.lic-hero__name { margin: 0; font-size: 20px; line-height: 24px; font-weight: 600; color: var(--ink); }
+.lic-hero__actions { margin-left: auto; display: flex; align-items: center; gap: var(--gap-8); }
+/* кнопки одной геометрии — 32px, как контролы тулбара */
+.lic-hero__actions .btn { flex: 0 0 auto; height: var(--control-h); padding: 0 16px; }
+/* плашки состояния лицензии */
+.lic-tag {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.lic-tag--ok { background: var(--kind-scheme-bg); color: var(--kind-scheme); }
+.lic-tag--trial { border: 1px solid var(--accent); color: var(--accent); }
+/* строка свойств лицензии */
+.lic-meta { display: flex; flex-wrap: wrap; gap: var(--gap-8) 32px; }
+.lic-meta__label { font-size: 12px; line-height: 16px; color: var(--ink-60); }
+.lic-meta__value { font-size: 14px; line-height: 20px; color: var(--ink); }
+/* модули: подпись слева, плашки переносами */
+.lic-modules { display: flex; align-items: flex-start; gap: var(--gap-12); }
+.lic-modules__label { flex: 0 0 auto; padding-top: 3px; font-size: 12px; color: var(--ink-60); white-space: nowrap; }
+.lic-modules__list { display: flex; flex-wrap: wrap; gap: var(--gap-8); }
+/* добавленный пробным обновлением модуль — акцентный контур */
+.tag.tag--added { border: 1px solid var(--accent); background: var(--surface); color: var(--accent); }
+/* «+N ещё» / «Свернуть» — кликабельная плашка */
+.tag.tag--toggle { border: 1px solid var(--ink-16); background: var(--surface); color: var(--ink-80); cursor: pointer; }
+.tag.tag--toggle:hover { border-color: var(--accent); color: var(--accent); }
+/* пунктирная кнопка добавления в режиме правки */
+.tag.tag--add { border: 1px dashed var(--ink-30, rgba(9,30,51,.3)); background: var(--surface); color: var(--ink-80); cursor: pointer; }
+.tag.tag--add:hover { border-color: var(--accent); color: var(--accent); }
+/* крест удаления модуля */
+.tag__x { margin-left: 6px; opacity: 0.7; cursor: pointer; }
+.tag__x:hover { opacity: 1; }
+/* псевдо-select пакета в режиме правки */
+.lic-package { display: inline-flex; align-items: center; gap: var(--gap-4); padding: 2px 6px; margin: -2px -6px; border: 1px solid var(--ink-16); border-radius: var(--r-4); }
+/* конфигурация, поднятая пробным обновлением, — акцентом, как добавленные модули */
+.lic-upgraded { color: var(--accent); }
+.lic-package .chev img { display: block; }
+
+/* Шапка списка: заголовок слева, поиск и тумблер справа */
+.lic-list__head { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-16); margin-top: 8px; }
+.lic-list__tools { display: flex; align-items: center; gap: var(--gap-16); }
+.lic-list__tools .search { flex: 0 1 260px; }
+.lic-sub { font-size: 12px; color: var(--ink-60); }
+
+/* Тумблер «Показывать истёкшие» */
+.switch { display: flex; align-items: center; gap: var(--gap-8); cursor: pointer; white-space: nowrap; }
+.switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.switch__track { position: relative; width: 32px; height: 18px; border-radius: 9px; background: var(--ink-16); transition: background 0.12s ease; flex: 0 0 auto; }
+.switch__track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 2px rgba(9, 30, 51, 0.3); transition: left 0.12s ease; }
+.switch input:checked + .switch__track { background: var(--accent); }
+.switch input:checked + .switch__track::after { left: 16px; }
+
+/* Таблица лицензий. Скроллится по горизонтали сама (интерфейс — нет);
+   ID с названием слева и кнопки справа прилипают и видны всегда. */
+.lictable { border: 1px solid var(--card-border); border-radius: var(--r-6); background: var(--surface); overflow-x: auto; }
+.licrow {
+  position: relative;
+  display: grid;
+  /* без gap: прилипшие колонки должны смыкаться без щелей, воздух даёт
+     padding самих ячеек */
+  /* колонка действия 140px — влезает «Активировать» целиком */
+  grid-template-columns: 96px minmax(220px, 1fr) 110px 180px 120px 110px 140px 140px 36px;
+  align-items: center;
+  min-height: 44px;
+  min-width: 1060px; /* колонки не сжимаются — дальше скролл таблицы */
+  border-top: 1px solid var(--ink-08);
+  background: var(--surface); /* непрозрачный: его наследуют липкие ячейки */
+}
+.licrow > * { padding: 0 8px; }
+.licrow > :first-child { padding-left: 12px; }
+.licrow > :last-child { padding-right: 12px; }
+/* липкие ячейки перекрывают прокручиваемые */
+.licrow__id,
+.licrow__name,
+.licrow__action,
+.licrow__kebab { position: sticky; z-index: 1; background: inherit; align-self: stretch; display: flex; align-items: center; }
+.licrow__id { left: 0; }
+.licrow__name { left: 96px; }
+.licrow__action { right: 36px; justify-content: flex-end; }
+.licrow__kebab { right: 0; }
+/* сплошные цвета фонов: полупрозрачные не скрыли бы контент под липкими */
+.licrow--head { min-height: 36px; border-top: 0; background: #f2f4f6; font-size: 12px; color: var(--ink-60); }
+/* цветная кромка — на липкой ячейке ID, чтобы не уезжала при скролле */
+.licrow--current .licrow__id::before,
+.licrow--invalid .licrow__id::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.licrow--current .licrow__id::before { background: var(--kind-scheme); }
+.licrow--invalid .licrow__id::before { background: var(--danger); }
+.licrow--invalid { background: #fdf4f4; }
+.licrow__id { color: var(--ink-60); }
+.licrow--invalid .licrow__id { color: var(--danger); }
+.licrow__name { display: flex; align-items: center; gap: var(--gap-8); min-width: 0; }
+.licrow__name span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* «+N» — количество модулей в лицензии */
+.licrow__extra { flex: 0 0 auto; padding: 1px 6px; border-radius: var(--r-4); background: var(--ink-08); font-size: 12px; color: var(--ink-60); }
+.lic-warn { color: var(--kind-kit); }
+.lic-danger { color: var(--danger); }
+.lic-ok { color: var(--kind-scheme); }
+.licrow .btn { flex: none; padding: 2px 12px; white-space: nowrap; }
 
 /* Общие строки карточек */
 .card-meta { display: flex; align-items: center; gap: var(--gap-8); }
-.card-meta__text { flex: 1 1 auto; min-width: 0; }
+.card-meta__text { flex: 1 1 auto; min-width: 0; container-type: inline-size; }
 .card-meta__label { font-size: 10px; line-height: 14px; color: var(--ink-60); }
-.card-meta__value { font-size: 12px; line-height: 16px; color: var(--ink-80); }
+.card-meta__value { font-size: 12px; line-height: 16px; color: var(--ink-80); white-space: nowrap; }
+/* в тесной карточке время прячется, остаётся дата; полное значение в title.
+   130px — ширина «19.05.2024 08:25:44» при 12px */
+@container (max-width: 130px) {
+  .card-meta__time { display: none; }
+}
 .card-divider { height: 1px; background: var(--ink-08); }
 .card-foot {
   display: flex;
