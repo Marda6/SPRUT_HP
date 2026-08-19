@@ -1,0 +1,6 @@
+<!-- Заглушка: заменить на экспорт из Figma, когда появится -->
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M2 2.5H4.5V13.5H2V2.5Z" stroke="#091E33" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M6 2.5H8.5V13.5H6V2.5Z" stroke="#091E33" stroke-width="1.2" stroke-linejoin="round"/>
+<path d="M10.2 3.4L12.6 2.9L14.6 13L12.2 13.5L10.2 3.4Z" stroke="#091E33" stroke-width="1.2" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,5 @@
+<!-- Заглушка: заменить на экспорт из Figma, когда появится -->
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="5.5" cy="6" r="3" stroke="#091E33" stroke-width="1.2"/>
+<path d="M7.8 8.2L13.5 13.5M11.5 11.5L13 10M9.7 9.9L11.2 8.4" stroke="#091E33" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

@@ -163,6 +163,301 @@
     fitEquipment();
   }
 
+  /* ── Расширения ────────────────────────────────────────── */
+  /* Карточка расширения: контент из референса, стиль карточки компонента */
+  function renderExtItems(list) {
+    const host = $('#ext-items');
+    host.textContent = '';
+    list.forEach((x) => {
+      const kindDef = EXT_KINDS.find((k) => k.id === x.kind) || {};
+      const card = el('div', 'ext');
+      card.dataset.id = x.id;
+      if (x.selected) card.classList.add('is-selected');
+
+      const preview = el('div', 'ext__preview');
+      const pv = el('span', 'pv');
+      previewInto(pv, 48, kindDef.icon);
+      preview.appendChild(pv);
+
+      const body = el('div', 'ext__body');
+      const head = el('div', 'dmc__head');
+      const name = el('h3', 'ext__name');
+      name.textContent = x.name;
+      name.title = x.name;
+      const fav = iconButton(x.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg',
+        x.favorite ? 'Убрать из избранного' : 'В избранное');
+      fav.classList.add('card-icon--fav');
+      if (x.favorite) fav.classList.add('is-on');
+      fav.dataset.fav = x.id;
+      head.append(name, fav);
+
+      const sub = el('div', 'ext__sub');
+      sub.textContent = `v${x.version} · ${x.publisher}`;
+      const about = el('p', 'ext__about');
+      about.textContent = x.about;
+      about.title = x.about;
+      body.append(head, sub, about);
+
+      // футер: категория и загрузки слева, действие справа
+      const foot = el('div', 'card-foot');
+      const kind = el('span', `kind-tag kind-tag--${x.kind}`);
+      kind.textContent = kindDef.chip || '';
+      const downloads = el('span', 'ext__downloads');
+      // стрелка вниз + короткое число, как в референсе (⤓ 12.4k);
+      // полное число — в тултипе
+      const dlNum = el('span');
+      dlNum.textContent = extDownloadsLabel(x.downloads);
+      downloads.append(el('span', 'ext__dl-glyph'), dlNum);
+      downloads.title = `${String(x.downloads).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} загрузок`;
+      // обе кнопки светлые: тёмная заливка в системе — признак выбранного
+      // элемента, а не действия
+      // «Установить» — контурная акцентная, «Открыть» у установленного —
+      // залитая акцентом: заметнее и не путается с установкой
+      const action = el('button', x.installed ? 'btn ext__open' : 'btn ext__install');
+      action.type = 'button';
+      action.textContent = x.installed ? 'Открыть' : 'Установить';
+      if (x.installed) action.title = 'Расширение установлено';
+      foot.append(kind, el('span', 'ext__foot-sep'), downloads,
+        el('span', 'card-foot__spacer'), action);
+
+      const col = el('div', 'ext__col');
+      col.append(body, el('div', 'card-divider'), foot);
+      card.append(preview, col);
+      host.appendChild(card);
+    });
+  }
+
+  function visibleExt() {
+    const q = state.extQuery.trim().toLowerCase();
+    const f = state.extFilters;
+    return EXT_ITEMS.filter((x) => {
+      const byFilter = state.extFilter === 'all'
+        || (state.extFilter === 'installed' && x.installed)
+        || (state.extFilter === 'favorite' && x.favorite);
+      const byKind = !f.kinds.size || f.kinds.has(x.kind);
+      const byAuthor = !f.authors.size || f.authors.has(x.publisher);
+      const byTags = !f.tags.size || (x.tags || []).some((t) => f.tags.has(t));
+      const byPrice = f.price === 'any' || (f.price === 'free' ? !x.price : !!x.price);
+      const byQuery = !q || x.name.toLowerCase().includes(q) || x.about.toLowerCase().includes(q);
+      return byFilter && byKind && byAuthor && byTags && byPrice && byQuery;
+    }).map((x) => ({ ...x, selected: x.id === state.extSelectedId }));
+  }
+
+  /* ── Фильтры-комбобоксы: категория, автор, теги — множественный выбор
+     с поиском; цена — одиночный ─────────────────────────────── */
+  function extFilterDefs() {
+    const uniq = (arr) => [...new Set(arr)];
+    return [
+      { key: 'kinds', label: 'Категория', multi: true,
+        options: EXT_KINDS.filter((k) => k.id !== 'all').map((k) => ({
+          value: k.id, label: k.label,
+          hint: String(EXT_ITEMS.filter((x) => x.kind === k.id).length), // счётчик — как был у чипов
+        })) },
+      { key: 'authors', label: 'Автор', multi: true,
+        options: uniq(EXT_ITEMS.map((x) => x.publisher)).map((p) => ({ value: p, label: p })) },
+      { key: 'tags', label: 'Теги', multi: true,
+        options: uniq(EXT_ITEMS.flatMap((x) => x.tags || [])).sort().map((t) => ({ value: t, label: t })) },
+      { key: 'price', label: 'Цена', multi: false,
+        options: [
+          { value: 'any', label: 'Любая' },
+          { value: 'free', label: 'Бесплатно' },
+          { value: 'paid', label: 'Платно' },
+        ] },
+    ];
+  }
+
+  function buildCombo(def) {
+    const box = el('div', 'combo');
+    const btn = el('button', 'combo__btn');
+    btn.type = 'button';
+    const label = el('span');
+    label.textContent = def.label;
+    const count = el('span', 'combo__count');
+    const chev = el('span', 'chev');
+    const chevImg = el('img');
+    chevImg.src = 'assets/img/icn-chevron.svg';
+    chevImg.alt = '';
+    chev.appendChild(chevImg);
+    btn.append(label, count, chev);
+
+    const pop = el('div', 'combo__pop is-hidden');
+    // поиск внутри — списки авторов и тегов будут расти
+    const search = el('label', 'combo__search');
+    const sIcon = el('img');
+    sIcon.src = 'assets/img/icn-search.svg';
+    sIcon.alt = '';
+    const sInput = el('input');
+    sInput.type = 'search';
+    sInput.placeholder = 'Поиск';
+    search.append(sInput, sIcon);
+    const list = el('div', 'combo__list');
+    const empty = el('div', 'combo__empty is-hidden');
+    empty.textContent = 'Ничего не найдено';
+    pop.append(search, list, empty);
+    box.append(btn, pop);
+
+    const updateCount = () => {
+      if (def.multi) {
+        const n = state.extFilters[def.key].size;
+        count.textContent = n ? `· ${n}` : '';
+      } else {
+        const v = state.extFilters[def.key];
+        const opt = def.options.find((o) => o.value === v);
+        count.textContent = v === 'any' ? '' : `· ${opt.label}`;
+      }
+    };
+
+    def.options.forEach((opt) => {
+      const row = el('label', 'combo__opt');
+      row.dataset.label = opt.label.toLowerCase();
+      const input = el('input');
+      input.type = def.multi ? 'checkbox' : 'radio';
+      if (!def.multi) input.name = `combo-${def.key}`;
+      input.checked = def.multi
+        ? state.extFilters[def.key].has(opt.value)
+        : state.extFilters[def.key] === opt.value;
+      const text = el('span', 'combo__opt-label');
+      text.textContent = opt.label;
+      row.append(input, text);
+      if (opt.hint) {
+        const hint = el('span', 'combo__opt-hint');
+        hint.textContent = opt.hint;
+        row.appendChild(hint);
+      }
+      input.addEventListener('change', () => {
+        if (def.multi) {
+          const set = state.extFilters[def.key];
+          input.checked ? set.add(opt.value) : set.delete(opt.value);
+        } else {
+          state.extFilters[def.key] = opt.value;
+          pop.classList.add('is-hidden'); // одиночный выбор закрывает список
+        }
+        updateCount();
+        refreshExt();
+      });
+      list.appendChild(row);
+    });
+
+    sInput.addEventListener('input', () => {
+      const q = sInput.value.trim().toLowerCase();
+      let shown = 0;
+      list.querySelectorAll('.combo__opt').forEach((row) => {
+        const hit = !q || row.dataset.label.includes(q);
+        row.classList.toggle('is-hidden', !hit);
+        if (hit) shown += 1;
+      });
+      empty.classList.toggle('is-hidden', shown > 0);
+    });
+
+    btn.addEventListener('click', () => {
+      const wasHidden = pop.classList.contains('is-hidden');
+      document.querySelectorAll('.combo__pop').forEach((p) => p.classList.add('is-hidden'));
+      if (wasHidden) {
+        pop.classList.remove('is-hidden');
+        sInput.value = '';
+        sInput.dispatchEvent(new Event('input'));
+        sInput.focus();
+      }
+    });
+
+    box.updateCount = updateCount;
+    updateCount();
+    return box;
+  }
+
+  function renderExtFilters() {
+    const host = $('#ext-filters');
+    host.textContent = '';
+    const combos = extFilterDefs().map(buildCombo);
+    combos.forEach((c) => host.appendChild(c));
+    const reset = el('button', 'filters__reset');
+    reset.type = 'button';
+    reset.textContent = 'Сбросить';
+    reset.addEventListener('click', () => {
+      state.extFilters = { kinds: new Set(), authors: new Set(), tags: new Set(), price: 'any' };
+      renderExtFilters(); // проще пересобрать, чем чистить каждый чекбокс
+      refreshExt();
+    });
+    host.appendChild(reset);
+  }
+
+  /* Панель расширения: шапка как у панели компонента, ниже описание и данные */
+  function renderExtPanel(x) {
+    const kindDef = EXT_KINDS.find((k) => k.id === x.kind) || {};
+    previewInto($('#pext-preview'), 96, kindDef.icon);
+    $('#pext-name').textContent = x.name;
+    $('#pext-name').title = x.name;
+
+    const fav = $('#pext-fav');
+    fav.classList.toggle('is-on', !!x.favorite);
+    fav.dataset.fav = x.id;
+    fav.setAttribute('aria-label', x.favorite ? 'Убрать из избранного' : 'В избранное');
+    fav.querySelector('img').src = x.favorite ? 'assets/img/icn-star-on.svg' : 'assets/img/icn-star.svg';
+
+    const badges = $('#pext-badges');
+    badges.textContent = '';
+    const kind = el('span', `kind-tag kind-tag--${x.kind}`);
+    kind.textContent = kindDef.chip || '';
+    badges.appendChild(kind);
+    if (x.installed) {
+      const done = el('span', 'ext__installed');
+      const check = el('img');
+      check.src = 'assets/img/icn-access-granted.svg';
+      check.alt = '';
+      const doneLabel = el('span');
+      doneLabel.textContent = 'Установлено';
+      done.append(check, doneLabel);
+      badges.appendChild(done);
+    }
+
+    // издатель ┃ загрузки ┃ версия — как строка меты у компонента
+    const meta = $('#pext-meta');
+    meta.textContent = '';
+    [x.publisher, `${extDownloadsLabel(x.downloads)} загрузок`, `v${x.version}`].forEach((txt, i) => {
+      if (i) meta.appendChild(el('span', 'pdmc__meta-sep'));
+      const s = el('span');
+      s.textContent = txt;
+      meta.appendChild(s);
+    });
+
+    const cta = $('#pext-cta');
+    cta.textContent = '';
+    const actions = el('div', 'pdmc__actions');
+    const action = el('button', x.installed ? 'btn ext__open' : 'btn ext__install');
+    action.type = 'button';
+    action.textContent = x.installed ? 'Открыть' : 'Установить';
+    actions.appendChild(action);
+    cta.appendChild(actions);
+
+    const body = $('#pext-body');
+    body.textContent = '';
+    const about = el('p', 'pdmc__about');
+    about.textContent = x.about;
+    body.appendChild(block('Описание', about));
+
+    body.appendChild(block('Информация', propList([
+      ['Версия', x.version],
+      ['Издатель', x.publisher],
+      ['Категория', kindDef.chip || ''],
+      ['Загрузок', String(x.downloads).replace(/\B(?=(\d{3})+(?!\d))/g, ' ')],
+    ])));
+
+    const tags = el('div', 'tag-list');
+    (x.tags || []).forEach((t) => {
+      const tag = el('span', 'tag tag--neutral');
+      tag.textContent = t;
+      tags.appendChild(tag);
+    });
+    if (x.tags?.length) body.appendChild(block('Теги', tags));
+  }
+
+  function refreshExt() {
+    renderExtItems(visibleExt());
+    const selected = EXT_ITEMS.find((x) => x.id === state.extSelectedId);
+    if (selected) renderExtPanel(selected);
+    $('#panel-ext').classList.toggle('is-hidden', !selected || state.section !== 'extensions');
+  }
+
   /* ── Панель компонента: шапка + три вкладки ────────────── */
   function propList(rows) {
     const box = el('div', 'pdmc__props');
@@ -472,6 +767,7 @@
 
   /* ── Состояние и взаимодействия ────────────────────────── */
   const state = {
+    section: 'library', // раздел навигации: library | extensions
     realm: 'projects',
     filter: 'all',
     query: '',
@@ -480,6 +776,12 @@
     dmcKind: 'all',
     dmcSelectedId: 'd01',
     dmcTab: 'about',
+    extFilter: 'all', // все | установленные | избранные
+    extQuery: '',
+    extSelectedId: 'e01',
+    // фильтры-комбобоксы; пустое множество = «не фильтруем».
+    // Категории общие с чипами: чип выбирает одну, комбобокс — несколько
+    extFilters: { kinds: new Set(), authors: new Set(), tags: new Set(), price: 'any' },
   };
 
   function visibleProjects() {
@@ -496,7 +798,8 @@
     const selected = PROJECTS.find((p) => p.id === state.selectedId);
     if (selected) renderPanel(selected);
     // панель принадлежит своему разделу и в чужом всегда скрыта
-    $('#panel').classList.toggle('is-hidden', !selected || state.realm !== 'projects');
+    $('#panel').classList.toggle('is-hidden',
+      !selected || state.section !== 'library' || state.realm !== 'projects');
   }
 
   function visibleDmc() {
@@ -513,7 +816,31 @@
     renderDmcItems(visibleDmc());
     const selected = DMC_ITEMS.find((d) => d.id === state.dmcSelectedId);
     if (selected) renderDmcPanel(selected);
-    $('#panel-dmc').classList.toggle('is-hidden', !selected || state.realm !== 'dmc');
+    $('#panel-dmc').classList.toggle('is-hidden',
+      !selected || state.section !== 'library' || state.realm !== 'dmc');
+  }
+
+  /* Видимость тулбаров, чипов и секций — одно место, чтобы разделы навигации
+     и разделы библиотеки не спорили друг с другом */
+  function updateChrome() {
+    const lib = state.section === 'library';
+    const isProjects = state.realm === 'projects';
+    $('#toolbar-library').classList.toggle('is-hidden', !lib);
+    $('#chips-projects').classList.toggle('is-hidden', !lib || !isProjects);
+    $('#chips-dmc').classList.toggle('is-hidden', !lib || isProjects);
+    document.querySelectorAll('.content > .section:not(#realm-dmc):not(#realm-ext)').forEach((s) => {
+      s.classList.toggle('is-hidden', !lib || !isProjects);
+    });
+    $('#realm-dmc').classList.toggle('is-hidden', !lib || isProjects);
+    // загрузка компонентов идёт не отсюда — кнопка только у проектов
+    $('.btn-primary').classList.toggle('is-hidden', !lib || !isProjects);
+    $('#toolbar-ext').classList.toggle('is-hidden', lib);
+    $('#chips-ext').classList.toggle('is-hidden', lib);
+    $('#realm-ext').classList.toggle('is-hidden', lib);
+    // все панели перерисовываем: каждая сама скроется в чужом разделе
+    refresh();
+    refreshDmc();
+    refreshExt();
   }
 
   function bind() {
@@ -548,10 +875,13 @@
         if (row.id === 'chips-projects') {
           state.filter = chip.dataset.filter;
           refresh();
-        } else {
+        } else if (row.id === 'chips-dmc') {
           if (chip.dataset.filter) state.dmcFilter = chip.dataset.filter;
           if (chip.dataset.kind) state.dmcKind = chip.dataset.kind;
           refreshDmc();
+        } else {
+          if (chip.dataset.filter) state.extFilter = chip.dataset.filter;
+          refreshExt();
         }
       });
     });
@@ -581,29 +911,63 @@
       else refreshDmc();
     });
 
-    // разделы библиотеки: Проекты / Цифровое оборудование
-    document.querySelectorAll('.seg__btn').forEach((btn) => {
+    // разделы навигации: собраны «Библиотека» и «Расширения», у остальных
+    // кнопки есть, страниц нет
+    document.querySelectorAll('.navtab').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const isProjects = btn.dataset.realm === 'projects';
-        state.realm = isProjects ? 'projects' : 'dmc';
-        document.querySelectorAll('.seg__btn').forEach((b) => {
+        const section = btn.dataset.section;
+        if (section !== 'library' && section !== 'extensions') return;
+        state.section = section;
+        document.querySelectorAll('.navtab').forEach((b) => b.classList.toggle('is-active', b === btn));
+        updateChrome();
+      });
+    });
+
+    // разделы библиотеки: Проекты / Цифровое оборудование
+    document.querySelectorAll('#toolbar-library .seg__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.realm = btn.dataset.realm === 'projects' ? 'projects' : 'dmc';
+        document.querySelectorAll('#toolbar-library .seg__btn').forEach((b) => {
           const on = b === btn;
           b.classList.toggle('is-active', on);
           b.setAttribute('aria-selected', String(on));
         });
-        // у каждого раздела свои ряды чипов
-        $('#chips-projects').classList.toggle('is-hidden', !isProjects);
-        $('#chips-dmc').classList.toggle('is-hidden', isProjects);
-        document.querySelectorAll('.content > .section:not(#realm-dmc)').forEach((s) => {
-          s.classList.toggle('is-hidden', !isProjects);
-        });
-        $('#realm-dmc').classList.toggle('is-hidden', isProjects);
-        // загрузка компонентов идёт не отсюда — в DMC кнопки нет
-        $('.btn-primary').classList.toggle('is-hidden', !isProjects);
-        // обе панели перерисовываем: каждая сама скроется в чужом разделе
-        refresh();
-        refreshDmc();
+        updateChrome();
       });
+    });
+
+    // клик мимо комбобокса закрывает его список
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.combo')) return;
+      document.querySelectorAll('.combo__pop').forEach((p) => p.classList.add('is-hidden'));
+    });
+
+    // поиск расширений — своё поле в своём тулбаре
+    $('#ext-search').addEventListener('input', (e) => {
+      state.extQuery = e.target.value;
+      refreshExt();
+    });
+
+    // выбор расширения и избранное в карточке
+    $('#ext-items').addEventListener('click', (e) => {
+      const star = e.target.closest('.card-icon--fav');
+      if (star) {
+        const item = EXT_ITEMS.find((x) => x.id === star.dataset.fav);
+        item.favorite = !item.favorite;
+        refreshExt();
+        return;
+      }
+      const card = e.target.closest('.ext');
+      if (!card || e.target.closest('.btn')) return; // действие не меняет выбор
+      state.extSelectedId = card.dataset.id;
+      refreshExt();
+    });
+
+    // звезда в шапке панели расширения
+    $('#pext-fav').addEventListener('click', (e) => {
+      const item = EXT_ITEMS.find((x) => x.id === e.currentTarget.dataset.fav);
+      item.favorite = !item.favorite;
+      refreshExt();
     });
 
     // вкладки панели компонента
@@ -654,6 +1018,7 @@
 
   renderCollections();
   renderKindChips();
+  renderExtFilters();
   bind();
   refresh();
 })();

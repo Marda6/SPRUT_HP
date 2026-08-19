@@ -67,36 +67,50 @@
     </div>
   </header>
 
+  <!-- Навигация разделов (3064:14742). Верхний уровень: панель свойств
+       принадлежит разделу, поэтому живёт ниже навигации, а не рядом с ней -->
+  <nav class="section-nav" aria-label="Разделы">
+    <!-- иконки-заглушки выводятся маской (.navtab__glyph--*): на тёмном
+         активном табе перекрашиваются в цвет текста -->
+    <div class="section-nav__group">
+      <button class="navtab" type="button" data-section="recent">
+        <span class="navtab__glyph navtab__glyph--recent" aria-hidden="true"></span>Недавние</button>
+      <button class="navtab is-active" type="button" data-section="library" aria-current="page">
+        <span class="navtab__glyph navtab__glyph--library" aria-hidden="true"></span>Библиотека</button>
+      <button class="navtab" type="button" data-section="local">
+        <span class="navtab__glyph navtab__glyph--local" aria-hidden="true"></span>Локальные</button>
+      <!-- слева места хранения, справа отдельная библиотека компонентов -->
+      <span class="section-nav__sep"></span>
+      <button class="navtab" type="button" data-section="extensions">
+        <span class="navtab__glyph navtab__glyph--extensions" aria-hidden="true"></span>Расширения</button>
+    </div>
+    <button class="navtab" type="button" data-section="licenses">
+      <span class="navtab__glyph navtab__glyph--licenses" aria-hidden="true"></span>Менеджер лицензий</button>
+  </nav>
+
   <div class="app__body">
 
     <!-- ── Контент (machine 3064:14741) ────────────────────── -->
     <main class="content">
 
-      <!-- Навигация разделов (3064:14742) -->
-      <nav class="section-nav" aria-label="Разделы">
-        <div class="section-nav__group">
-          <button class="navtab" type="button" data-section="recent">Недавние</button>
-          <button class="navtab is-active" type="button" data-section="library" aria-current="page">Библиотека</button>
-          <button class="navtab" type="button" data-section="local">Локальные</button>
-          <!-- слева места хранения, справа отдельная библиотека компонентов -->
-          <span class="section-nav__sep"></span>
-          <button class="navtab" type="button" data-section="extensions">Расширения</button>
-        </div>
-        <button class="navtab" type="button" data-section="licenses">Менеджер лицензий</button>
-      </nav>
-
       <!-- Заголовок и тулбар (3064:14760) -->
-      <div class="toolbar">
+      <div class="toolbar" id="toolbar-library">
         <div class="toolbar__title">
           <h1 class="page-title">Библиотека</h1>
-          <!-- Разделы библиотеки. Второй уровень навигации: Библиотека → раздел -->
-          <div class="seg" role="tablist" aria-label="Раздел библиотеки">
+          <!-- Разделы библиотеки. Второй уровень навигации: Библиотека → раздел.
+               Скрыт по просьбе Руслана вместе со страницей «Цифровое
+               оборудование» — код оставлен, чтобы вернуть одним классом -->
+          <div class="seg is-hidden" role="tablist" aria-label="Раздел библиотеки">
             <button class="seg__btn is-active" type="button" role="tab" aria-selected="true" data-realm="projects">Проекты</button>
             <button class="seg__btn" type="button" role="tab" aria-selected="false" data-realm="dmc" title="Digital Machine Centre">Цифровое оборудование</button>
           </div>
         </div>
         <div class="toolbar__actions">
-          <button class="btn-primary" type="button">Загрузить проект</button>
+          <!-- В узком окне сворачивается в иконку (см. .btn-primary--icon в styles.css) -->
+          <button class="btn-primary btn-primary--icon" type="button" title="Загрузить проект">
+            <span class="btn-primary__glyph" aria-hidden="true"></span>
+            <span class="btn-primary__label">Загрузить проект</span>
+          </button>
           <label class="search">
             <input type="search" id="search" placeholder="Поиск" aria-label="Поиск проектов">
             <span class="search__icon"><img src="assets/img/icn-search.svg" alt=""></span>
@@ -107,6 +121,26 @@
           </button>
           <button class="chip-filter" type="button">
             <span>Фильры</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Расширения: тулбар. Структура и контент — из референса Extension
+           Store, оформление — как у «Библиотеки» -->
+      <div class="toolbar is-hidden" id="toolbar-ext">
+        <div class="toolbar__title">
+          <h1 class="page-title">Расширения</h1>
+          <!-- переключатель «Магазин | Установленные» не нужен:
+               установленные — это чип рядом с «Все» -->
+        </div>
+        <div class="toolbar__actions">
+          <label class="search">
+            <input type="search" id="ext-search" placeholder="Поиск" aria-label="Поиск расширений">
+            <span class="search__icon"><img src="assets/img/icn-search.svg" alt=""></span>
+          </label>
+          <button class="select" type="button">
+            <span>Недавние</span>
+            <span class="chev"><img src="assets/img/icn-chevron.svg" alt=""></span>
           </button>
         </div>
       </div>
@@ -130,6 +164,19 @@
         <span class="chips__sep"></span>
         <!-- категории с количеством компонентов — рендерятся из DMC_KINDS -->
         <span class="chips__set" id="chips-dmc-kind" role="group" aria-label="Категории компонентов"></span>
+      </div>
+
+      <!-- Расширения: доступ и категории — как в «Цифровом оборудовании» -->
+      <div class="chips is-hidden" id="chips-ext">
+        <span class="chips__set" role="group" aria-label="Фильтры расширений">
+          <button class="chip is-active" type="button" data-filter="all">Все</button>
+          <button class="chip" type="button" data-filter="installed">Установленные</button>
+          <button class="chip" type="button" data-filter="favorite">Избранные</button>
+        </span>
+        <span class="chips__sep"></span>
+        <!-- фильтры-комбобоксы вместо чипов категорий — рендерятся
+             в renderExtFilters() -->
+        <span class="chips__set filters" id="ext-filters" role="group" aria-label="Фильтры расширений"></span>
       </div>
 
       <!-- Подборки (3064:15497) -->
@@ -157,7 +204,34 @@
         <div class="grid grid--dmc" id="dmc-items"></div>
       </section>
 
+      <!-- Расширения. Заголовок секции не нужен — он уже есть в тулбаре -->
+      <section class="section is-hidden" id="realm-ext">
+        <div class="grid grid--ext" id="ext-items"></div>
+      </section>
+
     </main>
+
+    <!-- ── Панель расширения (та же анатомия, что у панели DMC) ─ -->
+    <aside class="panel panel--dmc is-hidden" id="panel-ext" aria-label="Свойства расширения">
+      <div class="pdmc__preview">
+        <span class="pv" id="pext-preview"></span>
+      </div>
+
+      <div class="pdmc__head">
+        <div class="pdmc__title">
+          <h2 class="pdmc__name" id="pext-name"></h2>
+          <button class="card-icon card-icon--fav is-on" type="button" id="pext-fav" aria-label="В избранное">
+            <img src="assets/img/icn-star.svg" alt="">
+          </button>
+        </div>
+        <div class="pdmc__badges" id="pext-badges"></div>
+        <div class="pdmc__meta" id="pext-meta"></div>
+      </div>
+
+      <div class="pdmc__cta" id="pext-cta"></div>
+
+      <div class="panel__scroll" id="pext-body"></div>
+    </aside>
 
     <!-- ── Панель компонента DMC ───────────────────────────── -->
     <aside class="panel panel--dmc is-hidden" id="panel-dmc" aria-label="Свойства компонента">

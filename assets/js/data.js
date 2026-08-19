@@ -163,6 +163,51 @@ const USERS_POOL = [
   { name: 'Сергей Гущин', mail: 'gushchin@mail.com', role: 'Редактирование', control: 'pill' },
 ];
 
+/* ── Расширения ──────────────────────────────────────────────
+   Контент, категории и счётчики — из референса Extension Store (ENCY),
+   оформление и структура карточек — наши. Категории как в референсе:
+   Utility / Operation / Operation Popup / Global. */
+const EXT_KINDS = [
+  { id: 'all', label: 'Все категории' },
+  // иконки — заглушки из имеющегося набора, заменить на экспорт из Figma
+  { id: 'utility', label: 'Утилиты', chip: 'Утилита', icon: 'assets/img/icn-terminal.svg' },
+  { id: 'operation', label: 'Операции', chip: 'Операция', icon: 'assets/img/icn-3d-model.svg' },
+  { id: 'popup', label: 'Окна операций', chip: 'Окно операции', icon: 'assets/img/icn-code.svg',
+    hint: 'Всплывающие окна операций' },
+  { id: 'global', label: 'Глобальные', chip: 'Глобальное', icon: 'assets/img/icn-kit.svg' },
+];
+
+const EXT_ITEMS = [
+  // price: 0 — бесплатно, число — рубли (для фильтра «Цена»)
+  { id: 'e01', name: 'CamAgent — AI assistant', version: '3.0.2', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'utility', downloads: 12400, price: 49000,
+    about: 'Запускает AI-ассистента CamAgent для этого экземпляра CAM.', tags: ['assistant', 'AI', 'utility'] },
+  { id: 'e02', name: 'DirectCladding operation extensions', version: '1.1.0', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'operation', downloads: 8100, favorite: true,
+    about: 'Расширения для расчёта траектории инструмента в операциях DirectCladding.', tags: ['cladding', 'CAM', 'additive'] },
+  { id: 'e03', name: 'EncyExtension', version: '0.1.0', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'utility', downloads: 5700,
+    about: 'Опишите, что делает ваше расширение.', tags: ['utility'] },
+  { id: 'e04', name: 'Example operation popup extension on C#', version: '1.0.0', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'popup', downloads: 3200,
+    about: 'Пример расширения всплывающего окна операции на C#.', tags: ['utility'] },
+  { id: 'e05', name: 'Example utility extension on C#', version: '1.0.3', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'utility', downloads: 2400,
+    about: 'Пример расширения-утилиты на C#.', tags: ['utility'] },
+  { id: 'e06', name: 'Export project information', version: '1.0.1', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'global', downloads: 1800, favorite: true, installed: true,
+    about: 'Экспорт информации о проекте.', tags: ['utility', 'export', 'reporting'] },
+  { id: 'e07', name: 'Extension for Planar slicing operations', version: '1.2.2', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'operation', downloads: 1200,
+    about: 'Расчёт траекторий для операций планарного слайсинга на движке CuraEngine из состава Ultimaker Cura.', tags: ['CAM', 'fdm', 'additive'] },
+  { id: 'e08', name: 'HelloEncy', version: '0.1.0', publisher: 'kbelousov-ency', kind: 'utility', downloads: 940,
+    about: 'Тестовая утилита: сохраняет путь и ID активного проекта в текстовый файл и открывает его.', tags: ['utility'] },
+  { id: 'e09', name: 'Import SVG', version: '1.0.0', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'utility', downloads: 610,
+    about: 'Импорт SVG.', tags: ['utility', 'import'] },
+  { id: 'e10', name: 'Loading Game', version: '0.1.5', publisher: 'СПРУТ-ТЕХНОЛОГИЯ', kind: 'global', downloads: 280,
+    about: 'Игра на время ожидания: фреза прыгает через детали, пока СПРУТКАМ считает траектории.', tags: ['game', 'global'] },
+];
+
+/* «12,4 тыс.» — как в референсе (12.4k) */
+function extDownloadsLabel(n) {
+  if (n < 1000) return String(n);
+  const k = (n / 1000).toFixed(1).replace('.0', '').replace('.', ',');
+  return `${k} тыс.`;
+}
+
 const COLLECTIONS = [
   { name: '3D фрезерование', count: '12 проектов', changed: '18.06.2024 09:12:44', status: 'public' },
   { name: 'Обучение Роботы', count: '7 проектов', changed: '02.05.2024 14:03:19', status: 'public' },

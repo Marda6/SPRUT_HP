@@ -185,10 +185,14 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 44px;
-  padding: 4px;
-  border-radius: var(--r-12);
-  background: var(--ink-08);
+  height: 56px;
+  /* сверху воздух побольше — ряд разделов отделён от титульной строки окна */
+  padding: 12px 16px 6px;
+  /* верхний уровень: не скруглённая панель, а «отсечённая верхушка» —
+     от края до края, от остального интерфейса отделяется бордером; той же
+     линией по вертикали панель свойств отделена от контента */
+  border-bottom: 1px solid var(--ink-08);
+  background: var(--surface);
   flex: 0 0 auto;
 }
 .section-nav__group { display: flex; align-items: center; gap: var(--gap-4); height: 36px; }
@@ -196,6 +200,7 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .navtab {
   display: flex;
   align-items: center;
+  gap: var(--gap-8);
   height: 36px;
   padding: 8px 14px;
   border-radius: var(--r-6);
@@ -211,6 +216,21 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   font-weight: 500;
   border-radius: var(--r-4);
 }
+/* иконка раздела маской — в цвет текста таба (на активном станет белой) */
+.navtab__glyph {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask: var(--glyph) center / contain no-repeat;
+  mask: var(--glyph) center / contain no-repeat;
+}
+/* url() резолвится относительно этого файла (грабля №2 в HANDOFF) */
+.navtab__glyph--recent { --glyph: url(../img/icn-nav-recent.svg); }
+.navtab__glyph--library { --glyph: url(../img/icn-nav-library.svg); }
+.navtab__glyph--local { --glyph: url(../img/icn-nav-local.svg); }
+.navtab__glyph--extensions { --glyph: url(../img/icn-nav-extensions.svg); }
+.navtab__glyph--licenses { --glyph: url(../img/icn-nav-licenses.svg); }
 
 /* Заголовок + тулбар (3064:14760) */
 .toolbar {
@@ -219,9 +239,12 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   justify-content: space-between;
   height: 64px;
   padding: 0 12px;
+  /* воздух между заголовком и контролами: в узком окне за счёт него
+     сжимается поиск, а не прижимается кнопка к заголовку */
+  gap: 40px;
   flex: 0 0 auto;
 }
-.toolbar__title { display: flex; align-items: center; gap: var(--gap-16); min-width: 0; }
+.toolbar__title { display: flex; align-items: center; gap: var(--gap-16); min-width: 0; flex: 0 1 auto; }
 
 /* Разделы библиотеки — второй уровень навигации.
    Подложка светлее и активный сегмент белый, чтобы не спорить с тёмным
@@ -233,6 +256,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   padding: 2px;
   border-radius: var(--r-8);
   background: var(--ink-08);
+  /* Переключатель разделов не сжимаем: свободное место сначала отдаёт поиск
+     (до 180px), потом сворачивается кнопка загрузки */
   flex: 0 0 auto;
 }
 .seg__btn {
@@ -242,7 +267,13 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   padding: 0 12px;
   border-radius: var(--r-6);
   color: var(--ink-80);
+  /* В крайне узком окне режем текст троеточием, а не даём наехать на тулбар */
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  line-height: var(--control-h);
+  min-width: 0;
 }
 .seg__btn:hover { color: var(--ink); }
 .seg__btn.is-active {
@@ -274,7 +305,11 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
   display: flex;
   align-items: center;
   gap: var(--gap-8);
-  width: 840px;
+  /* 840px — желаемая ширина, но блок должен уметь сжиматься:
+     жёсткий width заставлял переключатель разделов уезжать под кнопку */
+  flex: 1 1 auto;
+  max-width: 840px;
+  min-width: 0;
   height: 100%;
 }
 
@@ -292,12 +327,32 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 }
 .btn-primary:hover { filter: brightness(1.12); }
 
+/* Глиф нарисован в #091E33 под светлый фон — на тёмной кнопке выводим маской */
+.btn-primary__glyph {
+  display: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: url(../img/icn-upload.svg) center / contain no-repeat;
+  mask: url(../img/icn-upload.svg) center / contain no-repeat;
+}
+
+/* Узкое окно: кнопка сворачивается в иконку, освобождая место переключателю
+   разделов и поиску. Смысл сохраняет тултип title. */
+@media (max-width: 1360px) {
+  .btn-primary--icon { width: var(--control-h); padding: 0; }
+  .btn-primary--icon .btn-primary__label { display: none; }
+  .btn-primary--icon .btn-primary__glyph { display: block; }
+}
+
 .search {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* Ниже 180px поле бесполезно: плейсхолдер обрезается, введённый запрос
+     не виден целиком. Поэтому дальше сжимаются другие контролы, не поиск. */
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 180px;
   height: var(--control-h);
   padding: 0 12px;
   border: 1px solid var(--ink-16);
@@ -386,25 +441,28 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .section__link:hover { color: var(--ink); }
 
 /* ── Сетки карточек ──────────────────────────────────────── */
+/* Число колонок подстраивается под ширину: 4 в широком окне, меньше в узком.
+   Жёсткие 4 колонки давали нечитаемые карточки с обрезанным названием. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--project-card-min), 1fr));
   gap: var(--gap-16);
   padding: 2px;
 }
+/* Карточка тянется на всю колонку: ограничение по ширине оставляло пустые
+   поля справа от каждой карточки */
 
-/* Компоненты DMC. Ширина карточки фиксирована по содержимому:
-   12 + подпись 108 + 12 + самая широкая плашка оснащения 165 + 4 + «+N» 32 + 8.
-   Карточки не растягиваются, лишнее место уходит в промежутки между ними. */
-/* Число колонок считается по минимуму (иначе браузер берёт максимум и теряет
-   одну колонку), а ширину карточки ограничиваем сверху, чтобы на широких
-   окнах она не разъезжалась. */
+/* Компоненты DMC. Минимум колонки 430px — при нём помещается превью 120 +
+   подпись 85 + самая широкая плашка оснащения 161 + «+N». Число колонок
+   считается по минимуму (иначе браузер берёт максимум и теряет одну колонку),
+   дальше карточки растягиваются на всю доступную ширину. */
 .grid--dmc { grid-template-columns: repeat(auto-fill, minmax(var(--dmc-card-min), 1fr)); }
-.dmc { max-width: var(--dmc-card-w); }
 
 /* Подборки: карточка фиксированной ширины 287.5px, ряд выровнен влево (3064:15501) */
 .grid--collections {
-  grid-template-columns: repeat(4, 287.5px);
+  /* Всегда одна строка из 4 подборок: перенос на вторую строку ломает
+     соотношение с блоком «Проекты». В узком окне карточки сужаются. */
+  grid-template-columns: repeat(4, minmax(0, var(--collection-card-w)));
   justify-content: start;
 }
 
@@ -627,13 +685,195 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 .kind-tag--interpreters { background: var(--kind-interpreter); }
 .kind-tag--posts { background: var(--kind-post); }
 .kind-tag--kits { background: var(--kind-kit); }
+/* категории расширений — цвета как в референсе, из имеющейся палитры:
+   утилита синяя, операция зелёная, окно операции фиолетовое, глобальное
+   янтарное. Заливка прозрачная, читаемость держит тёмный тон в тексте. */
+.kind-tag--utility { background: var(--kind-post-bg); color: var(--kind-post); }
+.kind-tag--operation { background: var(--kind-scheme-bg); color: var(--kind-scheme); }
+.kind-tag--popup { background: var(--kind-interpreter-bg); color: var(--kind-interpreter); }
+.kind-tag--global { background: var(--kind-kit-bg); color: var(--kind-kit); }
 .card-foot__spacer { flex: 1 1 auto; }
 /* «В избранное»: у избранных видна всегда, у остальных появляется по ховеру */
 .card-icon--fav { opacity: 0; transition: opacity 0.12s ease; }
 .card-icon--fav.is-on,
 .dmc:hover .card-icon--fav,
+.ext:hover .card-icon--fav,
 .project:hover .card-icon--fav,
 .card-icon--fav:focus-visible { opacity: 1; }
+
+/* ── Карточка расширения ─────────────────────────────────── */
+/* Горизонтальная, по образцу карточки компонента: превью слева, текст в
+   колонке, футер с категорией и действием. */
+.grid--ext { grid-template-columns: repeat(auto-fill, minmax(var(--ext-card-min), 1fr)); }
+.ext {
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--r-6);
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  text-align: left;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.ext { cursor: pointer; }
+.ext:hover { border-color: var(--accent); }
+.ext:hover .ext__name { color: var(--accent); }
+.ext.is-selected { border-color: var(--accent); box-shadow: var(--card-shadow-selected); }
+.ext.is-selected .ext__name { color: var(--accent); }
+.ext.is-selected .ext__preview { background: var(--ink-08); }
+.ext__preview {
+  position: relative;
+  width: 96px;
+  flex: 0 0 auto;
+  background: var(--ink-04);
+}
+.ext__preview .pv {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.ext__col { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; padding: 8px 0; }
+.ext__body { display: flex; flex-direction: column; gap: var(--gap-4); flex: 1 1 auto; padding: 0 12px 8px; }
+.ext__name {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* версия и издатель одной строкой под названием */
+.ext__sub { font-size: 12px; line-height: 16px; color: var(--ink-60); }
+/* описание не выше двух строк — высота карточек одинаковая */
+.ext__about {
+  margin: 0;
+  min-height: 36px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--ink-80);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ext .card-foot { padding: 8px 12px 0; gap: var(--gap-8); }
+/* в тесноте подпись загрузок ужимается первой — кнопка обрезаться не должна */
+.ext__downloads {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-60);
+  white-space: nowrap;
+}
+/* стрелка вниз при числе; глиф в цвет текста через маску */
+.ext__dl-glyph {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  background: currentColor;
+  -webkit-mask: url(../img/icn-arrow-down.svg) center / contain no-repeat;
+  mask: url(../img/icn-arrow-down.svg) center / contain no-repeat;
+}
+/* кнопка действия компактнее панельной: карточка ниже */
+.ext .btn { flex: 0 0 auto; padding: 4px 16px; }
+/* разделитель между категорией и загрузками, как между группами чипов */
+.ext__foot-sep { width: 1px; height: 16px; background: var(--ink-16); flex: 0 0 auto; }
+
+/* ── Ряд фильтров с комбобоксами (открывается кнопкой «Фильры») ── */
+.filters { display: flex; align-items: center; gap: var(--gap-8); flex: 0 0 auto; }
+.chip-filter.is-active { background: var(--ink-08); }
+.combo { position: relative; }
+/* кнопка комбобокса — геометрия .select */
+.combo__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-8);
+  height: var(--control-h);
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--ink-08);
+  border-radius: var(--r-6);
+  background: var(--ink-04);
+  color: var(--n-800);
+  white-space: nowrap;
+}
+.combo__btn:hover { background: var(--ink-08); }
+/* у активного фильтра значение/счётчик в кнопке */
+.combo__count { color: var(--accent); font-weight: 500; }
+.combo__pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 30;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-8);
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--ink-16);
+  border-radius: var(--r-6);
+  box-shadow: 0 8px 24px rgba(9, 30, 51, 0.14);
+}
+.combo__search {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-8);
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--ink-16);
+  border-radius: var(--r-6);
+}
+.combo__search input { flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: none; font: inherit; color: var(--n-900); }
+.combo__search img { width: 16px; height: 16px; }
+.combo__list { display: flex; flex-direction: column; max-height: 240px; overflow-y: auto; }
+.combo__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-8);
+  padding: 6px 8px;
+  border-radius: var(--r-4);
+  cursor: pointer;
+  color: var(--n-900);
+}
+.combo__opt:hover { background: var(--ink-04); }
+.combo__opt input { accent-color: var(--accent); margin: 0; flex: 0 0 auto; }
+.combo__opt-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.combo__opt-hint { color: var(--ink-60); font-size: 12px; }
+.combo__empty { padding: 6px 8px; color: var(--ink-60); }
+/* сброс всех фильтров — текстовая ссылка в конце ряда */
+.filters__reset { color: var(--accent); white-space: nowrap; }
+.filters__reset:hover { text-decoration: underline; }
+/* Двойной класс: .btn объявлен ниже по файлу и при равной специфичности
+   перебивал бы эти правила (грабля №1 в HANDOFF) */
+/* «Установить» — контурная акцентная */
+.btn.ext__install { border-color: var(--accent); color: var(--accent); }
+.btn.ext__install:hover { background: rgba(54, 113, 216, 0.06); }
+/* «Открыть» у установленного — тёмная заливка, как у активного чипа */
+.btn.ext__open { background: var(--ink-80); border-color: transparent; color: #fff; }
+.btn.ext__open:hover { background: var(--ink); }
+/* отметка состояния у установленного; кнопка «Открыть» остаётся нейтральной */
+.ext__installed {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-4);
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--kind-scheme);
+  white-space: nowrap;
+}
+.ext__installed img { width: 16px; height: 16px; }
 
 /* Общие строки карточек */
 .card-meta { display: flex; align-items: center; gap: var(--gap-8); }
@@ -698,6 +938,8 @@ img[src$="icn-search.svg"]        { width: 15px;     height: 16.694px; }
 /* места по вертикали хватает, поэтому шаг между блоками крупнее, чем
    в панели проекта: 16px снаружи, 12px внутри групп */
 .panel.panel--dmc { width: var(--panel-dmc-w); gap: var(--gap-16); padding: 16px; }
+/* панель расширения уже: контента меньше, чем у компонента с его вкладками */
+.panel.panel--dmc#panel-ext { width: var(--panel-w); }
 .pdmc__head { display: flex; flex-direction: column; gap: var(--gap-8); flex: 0 0 auto; }
 .panel--dmc .panel__scroll { gap: var(--gap-16); }
 .pdmc__title { display: flex; align-items: flex-start; gap: var(--gap-8); }
